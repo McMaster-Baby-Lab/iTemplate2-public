@@ -4,270 +4,650 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>iTemplate2 – Eye-movement analysis for dynamic faces</title>
-<meta name="description" content="iTemplate2 is an open-source Python toolbox with a desktop GUI that maps eye-tracking gaze data onto a normalised face template for videos and images.">
+<meta name="description" content="iTemplate2 is an open-source Python toolbox with a desktop GUI that maps eye-tracking gaze onto a canonical face template, frame by frame, for videos, images and wearable recordings.">
 <meta property="og:title" content="iTemplate2">
 <meta property="og:description" content="An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mcmaster-baby-lab.github.io/iTemplate2-public/">
-<meta property="og:image" content="https://mcmaster-baby-lab.github.io/iTemplate2-public/assets/face-extraction.webp">
+<meta property="og:image" content="https://mcmaster-baby-lab.github.io/iTemplate2-public/assets/fig5-gaze-before-after.webp">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/mcmaster-baby-lab.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#ffffff; --bg-alt:#f4f7f9; --surface:#ffffff; --text:#1c2730; --muted:#5a6b77;
-  --line:#dde5ea; --accent:#2b6f8c; --accent-strong:#1f5871; --accent-soft:#e4f0f5; --on-accent:#ffffff;
-  --code-bg:#14202a; --code-text:#e6eef3; --shadow:0 10px 30px rgba(20,40,55,.12);
+  /* Skin derived from the McMaster Baby Lab logo: warm cream paper, maroon-black ink, one maroon accent. */
+  --paper:#faf5ea; --paper-2:#f2e9d6; --card:#fffdf8; --input:#ece2cd; --store:#f0e6d2;
+  --ink:#2a1517; --muted:#5c4a47; --soft:#6b5753;
+  --rule:rgba(42,21,23,.14); --rule-solid:#d2c4aa;
+  --accent:#7b1426; --accent-tint:rgba(123,20,38,.08); --link:#1d5a73;
+  --serif:'Instrument Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  --sans:'Geist',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --logo-chip:transparent;
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --bg:#10181e; --bg-alt:#152029; --surface:#19252e; --text:#e8eff3; --muted:#9db0bc;
-    --line:#26363f; --accent:#6fb6d2; --accent-strong:#8ac8e0; --accent-soft:#1b323d; --on-accent:#0c1a22;
-    --code-bg:#0a1319; --code-text:#e6eef3; --shadow:0 10px 30px rgba(0,0,0,.45);
+    --paper:#1c1213; --paper-2:#261a1b; --card:#241819; --input:#2d2021; --store:#2a1d1e;
+    --ink:#f3ead8; --muted:#cbb9ab; --soft:#a99a8f;
+    --rule:rgba(243,234,216,.14); --rule-solid:#4a3b37;
+    --accent:#e8897c; --accent-tint:rgba(232,137,124,.12); --link:#86c3da;
+    --logo-chip:#faf5ea;
   }
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);
-  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-a{color:var(--accent)}
-a:hover{color:var(--accent-strong)}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-underline-offset:3px}
+a:hover{color:var(--accent)}
 img{max-width:100%;height:auto;display:block}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-.sr{position:absolute;left:-9999px}
+code{font-family:var(--mono);font-size:.9em;background:var(--paper-2);padding:1px 6px;border-radius:4px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.narrow{max-width:720px}
+section{padding:88px 0;scroll-margin-top:72px}
+section.alt{background:var(--paper-2);border-block:1px solid var(--rule)}
+
+/* type roles */
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;margin:0}
+h1{font-size:clamp(2.6rem,6.4vw,4.6rem);line-height:1.02}
+h1 em{color:var(--accent)}
+h2{font-size:clamp(2rem,4vw,2.9rem);line-height:1.08;margin:14px 0 18px}
+h3{font-size:1.5rem;line-height:1.2}
+.lead{font-size:clamp(1.05rem,2vw,1.3rem);color:var(--muted);max-width:660px;margin:22px 0 0}
+p{margin:0 0 16px}
+.lede{font-size:1.08rem;color:var(--muted);max-width:720px}
+.mono{font-family:var(--mono)}
+.callout{font-family:var(--serif);font-style:italic;font-size:1.35rem;line-height:1.35;color:var(--ink)}
+.quote{border-left:2px solid var(--accent);padding:2px 0 2px 20px;font-family:var(--serif);font-size:1.35rem;line-height:1.4;margin:24px 0;max-width:720px}
+.quote cite{display:block;font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-top:12px;font-style:normal}
 
 /* header */
-header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
-header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
-.brand{font-weight:700;font-size:1.15rem;color:var(--text);text-decoration:none;letter-spacing:-.01em}
-.brand span{color:var(--accent)}
-nav{display:flex;gap:20px;align-items:center;font-size:.95rem;overflow-x:auto}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:68px}
+.brand{font:400 26px/1 var(--serif);color:var(--ink);text-decoration:none}
+.brand b{font-weight:400;color:var(--accent)}
+nav{display:flex;align-items:center;gap:22px;font:500 13px/1 var(--sans);overflow-x:auto}
 nav a{color:var(--muted);text-decoration:none;white-space:nowrap}
-nav a:hover{color:var(--text)}
-nav a.gh{color:var(--text);font-weight:600;border:1px solid var(--line);padding:5px 12px;border-radius:8px}
-@media(max-width:700px){nav a.opt{display:none}}
+nav a:hover{color:var(--accent)}
+nav a.gh{color:var(--ink);border:1px solid var(--rule-solid);padding:7px 12px;border-radius:6px}
+.lab{display:flex;align-items:center;flex:none;background:var(--logo-chip);border-radius:8px;padding:2px 4px}
+.lab img{height:56px;width:auto}
+@media(max-width:900px){nav a.opt{display:none}}
+@media(max-width:560px){.brand{font-size:22px}.lab img{height:44px}header.top .wrap{gap:10px}nav{gap:12px}}
 
 /* hero */
-.hero{padding:64px 0 24px;text-align:center}
-.eyebrow{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--accent);background:var(--accent-soft);padding:4px 12px;border-radius:999px}
-h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.1;margin:18px 0 14px;letter-spacing:-.025em}
-.lead{font-size:clamp(1.05rem,2.2vw,1.25rem);color:var(--muted);max-width:720px;margin:0 auto 28px}
-.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.btn{display:inline-block;padding:11px 22px;border-radius:10px;font-weight:600;text-decoration:none;
-  border:1px solid var(--line);color:var(--text);background:var(--surface)}
-.btn:hover{border-color:var(--accent);color:var(--text)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
-.btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:var(--on-accent)}
-.shot{margin:44px auto 0;max-width:980px}
-.shot img{border-radius:14px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.hero{padding-top:72px;padding-bottom:40px}
+.badge{display:inline-flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font:500 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:26px}
+.badge b{color:var(--accent);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-block;padding:12px 22px;border-radius:6px;font:600 14px/1 var(--sans);text-decoration:none;border:1px solid var(--ink);color:var(--ink);background:transparent}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.btn.primary:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 
-/* sections */
-section{padding:72px 0;scroll-margin-top:60px}
-section.alt{background:var(--bg-alt);border-block:1px solid var(--line)}
-h2{font-size:clamp(1.6rem,3.5vw,2.1rem);line-height:1.2;margin:0 0 10px;letter-spacing:-.02em}
-.sub{color:var(--muted);max-width:680px;margin:0 0 36px}
-.center{text-align:center}.center .sub{margin-inline:auto}
-
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;counter-reset:s;padding:0;list-style:none;margin:0}
-.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
-.steps li::before{content:counter(s);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
-  background:var(--accent-soft);color:var(--accent-strong);font-weight:700;font-size:.9rem;margin-bottom:12px}
-.steps b{display:block;margin-bottom:4px}
-.steps span{color:var(--muted);font-size:.95rem}
-
-.pipeline{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
-.pipeline img{border-radius:14px;border:1px solid var(--line);background:#fff}
-@media(max-width:800px){.pipeline{grid-template-columns:1fr}}
-
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
-.card h3{margin:0 0 6px;font-size:1.05rem}
-.card p{margin:0;color:var(--muted);font-size:.95rem}
-
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.install>*,.grid2>*,.split>*,.fund>*,.authors>*,.labband>*,.ex>*{min-width:0}
+/* figures */
 figure{margin:0}
-figure a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
-figure img{transition:transform .25s}
-figure a:hover img{transform:scale(1.02)}
-figcaption{margin-top:10px;font-size:.92rem;color:var(--muted)}
-figcaption b{color:var(--text)}
+.fig{border:1px solid var(--rule-solid);border-radius:8px;overflow:hidden;background:#fff;display:block}
+.fig img{width:100%}
+figcaption{margin-top:12px;font-size:.92rem;color:var(--muted);line-height:1.55}
+figcaption .tag{display:block;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.hero-fig{margin-top:48px}
+.hero-fig .fig{max-width:1080px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.split{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center}
+.split.rev{grid-template-columns:1.15fr 1fr}
+@media(max-width:900px){.split,.split.rev{grid-template-columns:1fr;gap:28px}}
+
+/* diagrams */
+.dia{width:100%;overflow-x:auto;margin:32px 0 8px;border-block:1px solid var(--rule);padding:8px 0}
+.dia svg{width:100%;display:block}
+.dcap{font-size:.92rem;color:var(--muted);max-width:820px}
+.f-paper{fill:var(--paper)}.f-paper2{fill:var(--paper-2)}.f-card{fill:var(--card)}.f-input{fill:var(--input)}.f-store{fill:var(--store)}
+.f-ink{fill:var(--ink)}.f-muted{fill:var(--muted)}.f-soft{fill:var(--soft)}.f-acc{fill:var(--accent)}.f-acct{fill:var(--accent-tint)}
+.s-ink{stroke:var(--ink)}.s-muted{stroke:var(--muted)}.s-soft{stroke:var(--soft)}.s-rule{stroke:var(--rule-solid)}.s-acc{stroke:var(--accent)}
+.f-ring{stroke:var(--paper);stroke-width:1.5}
+svg text{fill:var(--ink)}
+.t-name{font:600 12px var(--sans)}
+.t-mono-name{font:600 12px var(--mono)}
+.t-sub{font:400 9px var(--mono);fill:var(--muted)}
+.t-eye{font:500 8px var(--mono);letter-spacing:.14em;fill:var(--soft)}
+.t-arrow{font:400 8px var(--mono);letter-spacing:.06em;fill:var(--soft)}
+.t-acc{fill:var(--accent)}
+.t-dotn{font:600 10px var(--mono);fill:var(--accent)}
+.t-note{font:400 11px var(--sans);fill:var(--muted)}
+.t-callout{font:italic 400 16px var(--serif);fill:var(--ink)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.card{background:var(--card);border:1px solid var(--rule-solid);border-radius:8px;padding:24px}
+.card h3{font-size:1.35rem;margin-bottom:8px}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+.card .num{font:500 11px/1 var(--mono);letter-spacing:.16em;color:var(--accent);display:block;margin-bottom:14px}
+.note{font-size:.92rem;color:var(--muted);max-width:760px}
+.sechead{display:flex;flex-direction:column;gap:2px;margin-bottom:12px}
+
+/* examples */
+.ex{display:grid;grid-template-columns:72px 1fr;gap:8px 28px;padding:36px 0;border-top:1px solid var(--rule)}
+.ex:first-of-type{border-top:0}
+.ex .n{font:400 3.2rem/1 var(--serif);color:var(--accent)}
+.ex h3{margin-bottom:10px}
+.ex p{color:var(--muted);max-width:760px}
+.ex figure{margin-top:20px;max-width:900px}
+@media(max-width:560px){.ex{grid-template-columns:1fr}.ex .n{font-size:2.4rem}}
 
 /* code */
-.code{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:12px;padding:18px 20px;
-  font:.88rem/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;margin:0 0 16px;white-space:pre}
-.code .c{color:#7f95a3}
-.copy{position:absolute;top:10px;right:10px;font:600 .75rem system-ui,sans-serif;background:#ffffff1a;color:#e6eef3;
-  border:1px solid #ffffff33;border-radius:6px;padding:4px 10px;cursor:pointer}
+.code{background:#1b1213;color:#f3ead8;border-radius:8px;padding:20px 22px;font:400 13px/1.75 var(--mono);overflow-x:auto;white-space:pre;position:relative;margin:0 0 16px}
+.code .c{color:#a99a8f}
+.copy{position:absolute;top:10px;right:10px;font:600 11px var(--sans);background:#ffffff1a;color:#f3ead8;border:1px solid #ffffff33;border-radius:6px;padding:4px 10px;cursor:pointer}
 .copy:hover{background:#ffffff33}
-.install{display:grid;grid-template-columns:1fr 1fr;gap:40px}
-@media(max-width:800px){.install{grid-template-columns:1fr}}
-.note{font-size:.92rem;color:var(--muted)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.chip{font-size:.82rem;padding:3px 11px;border-radius:999px;background:var(--accent-soft);color:var(--accent-strong);font-weight:600}
+.install{display:grid;grid-template-columns:1.2fr 1fr;gap:40px}
+@media(max-width:860px){.install{grid-template-columns:1fr}}
 
-blockquote{margin:0 0 16px;padding:16px 20px;border-left:4px solid var(--accent);background:var(--surface);
-  border-radius:0 10px 10px 0;border-block:1px solid var(--line);border-right:1px solid var(--line)}
+/* authors */
+.authors{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0 36px;margin-top:28px}
+.author{padding:22px 0;border-top:1px solid var(--rule-solid)}
+.author h3{font-size:1.6rem;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.author sup{font:500 11px var(--mono);color:var(--accent);letter-spacing:.04em}
+.author .role{color:var(--muted);font-size:.93rem;margin:6px 0 0}
+.badge-c{font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--paper);background:var(--accent);padding:4px 8px;border-radius:3px;align-self:center}
+.affil{margin:30px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:.95rem;color:var(--muted)}
+.affil li{display:grid;grid-template-columns:24px 1fr}
+.affil b{font:500 12px var(--mono);color:var(--accent)}
+.corr{margin-top:28px;padding:22px 24px;border:1px solid var(--rule-solid);border-radius:8px;background:var(--card);max-width:720px}
+.corr .eyebrow{display:block;margin-bottom:10px}
+.corr p{margin:0;color:var(--muted);font-size:.95rem}
+.corr strong{color:var(--ink)}
+.fund{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:44px}
+@media(max-width:860px){.fund{grid-template-columns:1fr}}
+.fund h3{font-size:1.3rem;margin-bottom:10px}
+.fund p{font-size:.92rem;color:var(--muted)}
 
-footer{padding:40px 0 56px;border-top:1px solid var(--line);color:var(--muted);font-size:.92rem}
-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+/* lab band + footer */
+.labband{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;padding:48px 0}
+.labband a.logo{display:block;background:var(--logo-chip);border-radius:12px;padding:6px}
+.labband img{width:200px;height:auto}
+.labband h2{font-size:2rem;margin:8px 0 10px}
+@media(max-width:640px){.labband{grid-template-columns:1fr}.labband img{width:160px}}
+footer{padding:28px 0 56px;border-top:1px solid var(--rule);color:var(--soft);font-size:.9rem}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px}
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top">i<span>Template</span>2</a>
+    <a class="brand" href="#top">i<b>Template</b>2</a>
     <nav aria-label="Primary">
-      <a class="opt" href="#how">How it works</a>
-      <a class="opt" href="#features">Features</a>
-      <a class="opt" href="#methods">Compared</a>
+      <a class="opt" href="#problem">The problem</a>
+      <a class="opt" href="#app">The app</a>
+      <a class="opt" href="#method">Method</a>
       <a class="opt" href="#examples">Examples</a>
-      <a class="opt" href="#screens">Screenshots</a>
+      <a class="opt" href="#compare">Compared</a>
       <a href="#install">Install</a>
-      <a class="opt" href="#cite">Cite</a>
+      <a class="opt" href="#authors">Authors</a>
       <a class="gh" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">GitHub</a>
     </nav>
+    <a class="lab" href="https://babylab.mcmaster.ca" aria-label="McMaster Baby Lab website"><img src="assets/mcmaster-baby-lab.webp" width="80" height="56" alt="McMaster Baby Lab logo: a hatching eaglet"></a>
   </div>
 </header>
 
 <main id="top">
-  <div class="wrap hero">
-    <span class="eyebrow">Open-source · Python · Desktop GUI</span>
-    <h1>See where participants looked on moving faces</h1>
-    <p class="lead">iTemplate2 maps eye-tracking gaze onto a common face template. Define your areas of interest <b>once</b>, then apply them across moving faces, stimuli and participants, in <b>videos</b> and <b>static images</b>.</p>
-    <div class="cta">
-      <a class="btn primary" href="#install">Get started</a>
-      <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">User guide</a>
-      <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">View on GitHub</a>
+
+<!-- HERO -->
+<div class="wrap hero">
+  <span class="eyebrow">Open-source · Python · Desktop GUI</span>
+  <h1 style="margin-top:18px;max-width:900px">Eye movements on moving faces, <em>in one common space.</em></h1>
+  <p class="lead">iTemplate2 maps eye-tracking gaze onto a canonical face template, frame by frame. Define your areas of interest once, then apply them across faces, expressions, stimuli and participants.</p>
+  <div class="cta">
+    <a class="btn primary" href="#install">Get started</a>
+    <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">User guide</a>
+    <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">View on GitHub</a>
+  </div>
+  <p class="badge"><b>In press</b><span>Xiao, Román-Caballero, Fang, Ripley, Han &amp; Trainor</span></p>
+  <figure class="hero-fig">
+    <a class="fig" href="assets/fig5-gaze-before-after.webp"><img src="assets/fig5-gaze-before-after.webp" width="1381" height="605" alt="Gaze samples on a video frame of an actress (left) and the same samples after transformation onto the template face (right); off-face samples are magenta."></a>
+    <figcaption><span class="tag">Paper figure 5</span>Gaze samples before (left, screen space) and after (right, template space) coordinate transformation. On-face samples are mapped using the estimated landmarks of the selected face. Off-face samples, shown as magenta dots, appear in peripheral template space for display only and are excluded from facial AOIs.</figcaption>
+  </figure>
+</div>
+
+<!-- 01 PROBLEM -->
+<section id="problem" class="alt">
+  <div class="wrap">
+    <span class="eyebrow">01 · The problem</span>
+    <h2>A fixed AOI stops fitting the moment a face moves</h2>
+    <div class="quote">In a video of a moving face, the pixel coordinates of facial features change in every frame. A gaze point at coordinate (350, 200) might fall on the left eye in Frame 1, the nose in Frame 10, and the background in Frame 20.<cite>From the paper</cite></div>
+    <div class="dia">
+      <svg viewBox="0 0 960 336" role="img" aria-labelledby="d-problem-title d-problem-desc" xmlns="http://www.w3.org/2000/svg" style="min-width:960px">
+<title id="d-problem-title">The same pixel lands on different facial features</title>
+<desc id="d-problem-desc">Three video frames in which one gaze pixel falls on the left eye, the nose and the background, mapped through facial landmarks onto one template face with a single set of AOIs.</desc>
+<defs>
+<marker id="d-problem-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-muted"/></marker>
+<marker id="d-problem-aa" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-acc"/></marker>
+</defs>
+<rect y="0" width="960" height="336" class="f-paper"/>
+<rect x="16" y="36" width="552" height="252" rx="8" fill="none" class="s-rule" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="760" y="36" width="184" height="252" rx="8" fill="none" class="s-rule" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="28" y="52" class="t-eye" text-anchor="start">VIDEO FRAMES · GAZE AT PIXEL (350, 200)</text>
+<text x="772" y="52" class="t-eye" text-anchor="start">TEMPLATE FACE</text>
+<line x1="568" y1="160" x2="596" y2="160" class="s-muted" stroke-width="1" marker-end="url(#d-problem-a)"/>
+<line x1="724" y1="160" x2="760" y2="160" class="s-muted" stroke-width="1" marker-end="url(#d-problem-a)"/>
+<rect x="24" y="64" width="168" height="176" rx="6" class="f-paper"/>
+<rect x="24" y="64" width="168" height="176" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="32" y="72" width="44" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="54" y="81" class="t-eye" text-anchor="middle">FRAME 1</text>
+<g transform="translate(24,64)">
+<ellipse cx="84" cy="96" rx="34" ry="46" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="70" cy="84" r="2.6" class="f-ink"/>
+<circle cx="98" cy="84" r="2.6" class="f-ink"/>
+<line x1="84" y1="90.0" x2="84" y2="102.0" class="s-soft" stroke-width="1.2"/>
+<path d="M74.0 116.0 Q84 122.0 94.0 116.0" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="70" cy="84" r="5" class="f-acc f-ring"/>
+<text x="77" y="78" class="t-dotn" text-anchor="start">1</text>
+</g>
+<text x="108" y="262" class="t-sub" text-anchor="middle">→ left eye</text>
+<rect x="208" y="64" width="168" height="176" rx="6" class="f-paper"/>
+<rect x="208" y="64" width="168" height="176" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="216" y="72" width="48" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="240" y="81" class="t-eye" text-anchor="middle">FRAME 10</text>
+<g transform="translate(208,64)">
+<ellipse cx="70" cy="82" rx="34" ry="46" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="56" cy="70" r="2.6" class="f-ink"/>
+<circle cx="84" cy="70" r="2.6" class="f-ink"/>
+<line x1="70" y1="76.0" x2="70" y2="88.0" class="s-soft" stroke-width="1.2"/>
+<path d="M60.0 102.0 Q70 108.0 80.0 102.0" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="70" cy="84" r="5" class="f-acc f-ring"/>
+<text x="56" y="100" class="t-dotn" text-anchor="start">2</text>
+</g>
+<text x="292" y="262" class="t-sub" text-anchor="middle">→ nose</text>
+<rect x="392" y="64" width="168" height="176" rx="6" class="f-paper"/>
+<rect x="392" y="64" width="168" height="176" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="400" y="72" width="48" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="424" y="81" class="t-eye" text-anchor="middle">FRAME 20</text>
+<g transform="translate(392,64)">
+<ellipse cx="118" cy="112" rx="34" ry="46" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="104" cy="100" r="2.6" class="f-ink"/>
+<circle cx="132" cy="100" r="2.6" class="f-ink"/>
+<line x1="118" y1="106.0" x2="118" y2="118.0" class="s-soft" stroke-width="1.2"/>
+<path d="M108.0 132.0 Q118 138.0 128.0 132.0" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="70" cy="84" r="5" class="f-acc f-ring"/>
+<text x="77" y="78" class="t-dotn" text-anchor="start">3</text>
+</g>
+<text x="476" y="262" class="t-sub" text-anchor="middle">→ background</text>
+<rect x="596" y="116" width="128" height="88" rx="6" class="f-paper"/>
+<rect x="596" y="116" width="128" height="88" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="604" y="124" width="40" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="624" y="133" class="t-eye" text-anchor="middle">STEP 3</text>
+<text x="660" y="168" class="t-name" text-anchor="middle">Landmark map</text>
+<text x="660" y="186" class="t-sub" text-anchor="middle">piecewise affine</text>
+<rect x="768" y="64" width="168" height="176" rx="6" class="f-paper"/>
+<rect x="768" y="64" width="168" height="176" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="776" y="72" width="48" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="800" y="81" class="t-eye" text-anchor="middle">TEMPLATE</text>
+<g transform="translate(768,64)">
+<ellipse cx="84" cy="104" rx="40" ry="56" fill="none" class="s-soft" stroke-width="1.2"/>
+<circle cx="68" cy="90" r="3.0" class="f-ink"/>
+<circle cx="100" cy="90" r="3.0" class="f-ink"/>
+<line x1="84" y1="97.1" x2="84" y2="110.9" class="s-soft" stroke-width="1.2"/>
+<path d="M72.5 127.0 Q84 133.9 95.5 127.0" fill="none" class="s-soft" stroke-width="1.2"/>
+<rect x="52" y="82" width="64" height="24" rx="2" fill="none" class="s-acc" stroke-width="1" stroke-dasharray="4,3"/>
+<circle cx="68" cy="90" r="5" class="f-acc f-ring"/>
+<text x="74" y="82" class="t-dotn" text-anchor="start">1</text>
+<circle cx="84" cy="106" r="5" class="f-acc f-ring"/>
+<text x="91" y="118" class="t-dotn" text-anchor="start">2</text>
+<circle cx="142" cy="150" r="5" class="f-acc f-ring"/>
+<text x="149" y="144" class="t-dotn" text-anchor="start">3</text>
+</g>
+<text x="852" y="262" class="t-sub" text-anchor="middle">dashed AOI, defined once</text>
+<text x="480" y="316" class="t-callout" text-anchor="middle">One pixel, three different answers. One template, one set of AOIs.</text>
+</svg>
     </div>
-    <div class="shot">
-      <img src="assets/face-extraction.webp" width="2000" height="1291" alt="iTemplate2 face extraction screen showing detected facial landmarks over a video frame">
+    <p class="dcap">Template-based registration answers this by projecting every gaze sample onto one canonical face, so a single set of AOIs is enough. The original <a href="https://doi.org/10.3758/s13428-018-1015-x">iTemplate</a> (Xiao &amp; Lee, 2018) did this for static images, with semi-manual landmarks and a MATLAB dependency. iTemplate2 extends the idea to video, wearable recordings and several faces at once.</p>
+  </div>
+</section>
+
+<!-- 02 FOUR ADVANCES -->
+<section id="advances">
+  <div class="wrap">
+    <span class="eyebrow">02 · What's new</span>
+    <h2>Four advances over the original iTemplate</h2>
+    <div class="cards">
+      <div class="card"><span class="num">01</span><h3>Dynamic stimuli</h3><p>Frame-wise coordinate transformation, with normalisation for wearable and scene-based eye-tracking data and temporal preprocessing for trial segmentation.</p></div>
+      <div class="card"><span class="num">02</span><h3>Automatic landmarks, many faces</h3><p>478 facial landmarks per frame from MediaPipe's Face Landmarker, with multi-face tracking and identity persistence that reduce manual annotation.</p></div>
+      <div class="card"><span class="num">03</span><h3>Open and cross-platform</h3><p>A graphical interface with no commercial dependencies, Apache Parquet storage for video-scale data and saved settings for reproducible analyses.</p></div>
+      <div class="card"><span class="num">04</span><h3>Richer visualisation</h3><p>Interactive heatmaps, snap-to-landmark AOI definition, and facial blendshape parameters for concurrent expression analysis.</p></div>
+    </div>
+    <div class="dia" style="margin-top:48px">
+      <svg viewBox="0 0 960 304" role="img" aria-labelledby="d-pipeline-title d-pipeline-desc" xmlns="http://www.w3.org/2000/svg" style="min-width:960px">
+<title id="d-pipeline-title">The iTemplate2 processing pipeline</title>
+<desc id="d-pipeline-desc">Stimuli and gaze data flow through face extraction, gaze preparation, template transformation, visualisation, AOI analysis and export.</desc>
+<defs>
+<marker id="d-pipeline-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-muted"/></marker>
+<marker id="d-pipeline-aa" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-acc"/></marker>
+</defs>
+<rect y="0" width="960" height="304" class="f-paper"/>
+<line x1="80" y1="68" x2="80" y2="120" class="s-muted" stroke-width="1" marker-end="url(#d-pipeline-a)"/>
+<line x1="240" y1="68" x2="240" y2="120" class="s-muted" stroke-width="1" marker-end="url(#d-pipeline-a)"/>
+<line x1="148" y1="166" x2="172" y2="166" class="s-muted" stroke-width="1" marker-end="url(#d-pipeline-a)"/>
+<line x1="308" y1="166" x2="332" y2="166" class="s-acc" stroke-width="1" marker-end="url(#d-pipeline-aa)"/>
+<line x1="468" y1="166" x2="492" y2="166" class="s-acc" stroke-width="1" marker-end="url(#d-pipeline-aa)"/>
+<line x1="628" y1="166" x2="652" y2="166" class="s-muted" stroke-width="1" marker-end="url(#d-pipeline-a)"/>
+<line x1="788" y1="166" x2="812" y2="166" class="s-muted" stroke-width="1" marker-end="url(#d-pipeline-a)"/>
+<rect x="16" y="24" width="128" height="44" rx="6" class="f-paper"/>
+<rect x="16" y="24" width="128" height="44" rx="6" class="f-input s-soft" stroke-width="1"/>
+<text x="80" y="50" class="t-name" text-anchor="middle">Stimuli</text>
+<rect x="176" y="24" width="128" height="44" rx="6" class="f-paper"/>
+<rect x="176" y="24" width="128" height="44" rx="6" class="f-input s-soft" stroke-width="1"/>
+<text x="240" y="50" class="t-name" text-anchor="middle">Gaze data</text>
+<rect x="12" y="120" width="136" height="92" rx="6" class="f-paper"/>
+<rect x="12" y="120" width="136" height="92" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="20" y="128" width="48" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="44" y="137" class="t-eye" text-anchor="middle">STEP 0–1</text>
+<text x="80" y="174" class="t-name" text-anchor="middle">Extract faces</text>
+<text x="80" y="192" class="t-sub" text-anchor="middle">478 landmarks</text>
+<rect x="172" y="120" width="136" height="92" rx="6" class="f-paper"/>
+<rect x="172" y="120" width="136" height="92" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="180" y="128" width="60" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="210" y="137" class="t-eye" text-anchor="middle">STEP 2–2.5</text>
+<text x="240" y="174" class="t-name" text-anchor="middle">Prepare gaze</text>
+<text x="240" y="192" class="t-sub" text-anchor="middle">trials · timing</text>
+<rect x="332" y="120" width="136" height="92" rx="6" class="f-paper"/>
+<rect x="332" y="120" width="136" height="92" rx="6" class="f-acct s-acc" stroke-width="1"/>
+<rect x="340" y="128" width="40" height="12" rx="2" fill="none" class="s-acc" stroke-opacity=".45" stroke-width=".8"/>
+<text x="360" y="137" class="t-eye" text-anchor="middle">STEP 3</text>
+<text x="400" y="174" class="t-name" text-anchor="middle">Transform</text>
+<text x="400" y="192" class="t-sub" text-anchor="middle">gaze → template</text>
+<rect x="492" y="120" width="136" height="92" rx="6" class="f-paper"/>
+<rect x="492" y="120" width="136" height="92" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="500" y="128" width="40" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="520" y="137" class="t-eye" text-anchor="middle">STEP 4</text>
+<text x="560" y="174" class="t-name" text-anchor="middle">Visualise</text>
+<text x="560" y="192" class="t-sub" text-anchor="middle">playback · heatmaps</text>
+<rect x="652" y="120" width="136" height="92" rx="6" class="f-paper"/>
+<rect x="652" y="120" width="136" height="92" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="660" y="128" width="40" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="680" y="137" class="t-eye" text-anchor="middle">STEP 5</text>
+<text x="720" y="174" class="t-name" text-anchor="middle">Analyse AOIs</text>
+<text x="720" y="192" class="t-sub" text-anchor="middle">template or stimulus</text>
+<rect x="812" y="120" width="136" height="92" rx="6" class="f-paper"/>
+<rect x="812" y="120" width="136" height="92" rx="6" class="f-card s-ink" stroke-width="1"/>
+<rect x="820" y="128" width="40" height="12" rx="2" fill="none" class="s-ink" stroke-opacity=".45" stroke-width=".8"/>
+<text x="840" y="137" class="t-eye" text-anchor="middle">STEP 6</text>
+<text x="880" y="174" class="t-name" text-anchor="middle">Export</text>
+<text x="880" y="192" class="t-sub" text-anchor="middle">CSV</text>
+<line x1="12" y1="252" x2="948" y2="252" class="s-rule" stroke-width=".8"/>
+<text x="12" y="276" class="t-eye" text-anchor="start">LEGEND</text>
+<rect x="96" y="266" width="16" height="12" rx="3" class="f-input s-soft" stroke-width="1"/>
+<text x="120" y="276" class="t-eye" text-anchor="start">DATA YOU PROVIDE</text>
+<rect x="288" y="266" width="16" height="12" rx="3" class="f-card s-ink" stroke-width="1"/>
+<text x="312" y="276" class="t-eye" text-anchor="start">PIPELINE STEP</text>
+<rect x="460" y="266" width="16" height="12" rx="3" class="f-acct s-acc" stroke-width="1"/>
+<text x="484" y="276" class="t-eye" text-anchor="start">CORE TRANSFORMATION</text>
+</svg>
+    </div>
+    <p class="dcap"><b>The workflow.</b> The process begins with data import and automated, high-density facial landmark extraction (Steps 0–1). Data review and temporal and spatial preprocessing segment trials and normalise gaze coordinates for screen-based and wearable data (Steps 2–2.5b). The core transformation maps gaze onto a standard face template (Step 3). Researchers then visualise the registered data (Step 4), run AOI analysis (Step 5) and export for statistics (Step 6). Redrawn from paper figure 1.</p>
+  </div>
+</section>
+
+<!-- 03 APP -->
+<section id="app" class="alt">
+  <div class="wrap">
+    <span class="eyebrow">03 · Inside the app</span>
+    <h2>One desktop app for the whole pipeline</h2>
+    <p class="lede">Each step is its own page in a sidebar, so you can work from top to bottom without hunting through menus. Click any screenshot to enlarge it.</p>
+    <div class="grid2" style="margin-top:36px">
+      <figure>
+        <a class="fig" href="assets/project-manager.webp"><img src="assets/project-manager.webp" width="1379" height="890" loading="lazy" alt="Project Manager screen with a file browser and a colour-coded data table"></a>
+        <figcaption><span class="tag">Paper figure 2 · Project Manager</span>Centralises file organisation and initial import. An integrated file browser structures the workflow into standard folders, and a colour-coded table previews the continuous eye-tracking data. Column remapping and stimulus-name standardisation accommodate diverse eye-tracker outputs.</figcaption>
+      </figure>
+      <figure>
+        <a class="fig" href="assets/face-extraction.webp"><img src="assets/face-extraction.webp" width="1351" height="878" loading="lazy" alt="Face Extraction screen showing a 478-point mesh on a video frame and a Face ID Management table"></a>
+        <figcaption><span class="tag">Paper figure 3 · Face Extraction</span>The left panel shows the automated 478-point landmark mesh, tessellated by Delaunay triangulation. The right panel holds Face ID Management, used to resolve identity fragmentation or ID swaps caused by occlusion in dynamic video.</figcaption>
+      </figure>
+      <figure>
+        <a class="fig" href="assets/visualization.webp"><img src="assets/visualization.webp" width="1380" height="900" loading="lazy" alt="Visualization screen with raw gaze on the video, transformed gaze on the template, and heatmaps"></a>
+        <figcaption><span class="tag">Paper figure 4 · Visualization</span>Synchronised playback compares raw gaze on the original dynamic stimulus (left) with transformed gaze registered to the template face (right). The lower panel builds aggregate heatmaps by two-dimensional Gaussian kernel density estimation, grouped by categorical variables and normalised per participant.</figcaption>
+      </figure>
+      <figure>
+        <a class="fig" href="assets/aoi-analysis.webp"><img src="assets/aoi-analysis.webp" width="2000" height="1290" loading="lazy" alt="AOI Analysis screen with eye and mouth polygons drawn on the template face"></a>
+        <figcaption><span class="tag">AOI Analysis</span>Draw polygon AOIs on the template face, snapped to the 478-point mesh so boundaries follow anatomy. AOIs can be exported as JSON to share identical definitions across studies and sites, or drawn on the original stimulus to study gaze beyond the face.</figcaption>
+      </figure>
     </div>
   </div>
+</section>
 
-  <section id="how" class="alt">
-    <div class="wrap">
-      <div class="center">
-        <h2>From raw gaze to analysis-ready data</h2>
-        <p class="sub">A guided, step-by-step workflow takes you through the whole pipeline inside one app.</p>
-      </div>
-      <ol class="steps">
-        <li><b>Extract faces</b><span>MediaPipe detects 478 landmarks per face in every frame, for up to five faces, with gap detection and ID checks.</span></li>
-        <li><b>Map gaze</b><span>Each gaze sample is transformed into a common template face space, frame by frame.</span></li>
-        <li><b>Visualise</b><span>Play gaze over the stimulus and build heatmaps, normalised per participant.</span></li>
-        <li><b>Analyse AOIs</b><span>Draw areas of interest on the template or the stimulus and compute gaze metrics.</span></li>
-        <li><b>Export</b><span>Save the columns you need to CSV for your statistics software.</span></li>
-      </ol>
+<!-- 04 METHOD -->
+<section id="method">
+  <div class="wrap">
+    <span class="eyebrow">04 · How the mapping works</span>
+    <h2>Triangles in, template coordinates out</h2>
+    <p class="lede">Each face is divided into small triangles whose corners are facial landmarks (a Delaunay triangulation). For every frame, the pipeline finds the triangle that contains a gaze sample and describes the sample as weights on that triangle's three corners, its barycentric coordinates. Applying the same weights to the matching template triangle gives the mapped location.</p>
+    <div class="dia">
+      <svg viewBox="0 0 960 328" role="img" aria-labelledby="d-bary-title d-bary-desc" xmlns="http://www.w3.org/2000/svg" style="min-width:960px">
+<title id="d-bary-title">Barycentric mapping from a stimulus triangle to a template triangle</title>
+<desc id="d-bary-desc">A gaze point inside a triangle of facial landmarks is described by three weights; applying the same weights to the matching template triangle gives its template location.</desc>
+<defs>
+<marker id="d-bary-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-muted"/></marker>
+<marker id="d-bary-aa" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-acc"/></marker>
+</defs>
+<rect y="0" width="960" height="328" class="f-paper"/>
+<rect x="24" y="40" width="372" height="240" rx="8" class="f-paper2 s-rule" stroke-width="1"/>
+<rect x="564" y="40" width="372" height="240" rx="8" class="f-paper2 s-rule" stroke-width="1"/>
+<text x="40" y="60" class="t-eye" text-anchor="start">STIMULUS FRAME f</text>
+<text x="580" y="60" class="t-eye" text-anchor="start">TEMPLATE FACE</text>
+<line x1="396" y1="160" x2="564" y2="160" class="s-acc" stroke-width="1" marker-end="url(#d-bary-aa)"/>
+<rect x="444" y="140" width="72" height="12" rx="2" class="f-paper"/>
+<text x="480" y="149" class="t-arrow" text-anchor="middle">SAME WEIGHTS</text>
+<text x="480" y="188" class="t-sub" text-anchor="middle">λ1 + λ2 + λ3 = 1</text>
+<text x="480" y="204" class="t-sub" text-anchor="middle">0 ≤ λi ≤ 1</text>
+<polygon points="96,232 344,208 176,84" class="f-card s-ink" stroke-width="1.2" stroke-linejoin="round"/>
+<line x1="202.4" y1="165.6" x2="96" y2="232" class="s-soft" stroke-width=".8" stroke-dasharray="3,3"/>
+<line x1="202.4" y1="165.6" x2="344" y2="208" class="s-soft" stroke-width=".8" stroke-dasharray="3,3"/>
+<line x1="202.4" y1="165.6" x2="176" y2="84" class="s-soft" stroke-width=".8" stroke-dasharray="3,3"/>
+<circle cx="96" cy="232" r="3" class="f-ink"/>
+<text x="82" y="248" class="t-sub" text-anchor="middle">V1</text>
+<circle cx="344" cy="208" r="3" class="f-ink"/>
+<text x="358" y="224" class="t-sub" text-anchor="middle">V2</text>
+<circle cx="176" cy="84" r="3" class="f-ink"/>
+<text x="176" y="74" class="t-sub" text-anchor="middle">V3</text>
+<circle cx="202.4" cy="165.6" r="5.5" class="f-acc f-ring"/>
+<text x="212.4" y="157.6" class="t-dotn" text-anchor="start">G</text>
+<polygon points="600,236 900,236 756,76" class="f-card s-ink" stroke-width="1.2" stroke-linejoin="round"/>
+<line x1="752.4" y1="172.0" x2="600" y2="236" class="s-soft" stroke-width=".8" stroke-dasharray="3,3"/>
+<line x1="752.4" y1="172.0" x2="900" y2="236" class="s-soft" stroke-width=".8" stroke-dasharray="3,3"/>
+<line x1="752.4" y1="172.0" x2="756" y2="76" class="s-soft" stroke-width=".8" stroke-dasharray="3,3"/>
+<circle cx="600" cy="236" r="3" class="f-ink"/>
+<text x="586" y="252" class="t-sub" text-anchor="middle">T1</text>
+<circle cx="900" cy="236" r="3" class="f-ink"/>
+<text x="914" y="252" class="t-sub" text-anchor="middle">T2</text>
+<circle cx="756" cy="76" r="3" class="f-ink"/>
+<text x="756" y="66" class="t-sub" text-anchor="middle">T3</text>
+<circle cx="752.4" cy="172.0" r="5.5" class="f-acc f-ring"/>
+<text x="762.4" y="164.0" class="t-dotn" text-anchor="start">G′</text>
+<text x="480" y="312" class="t-callout" text-anchor="middle">The same weights, applied to the matching template triangle, give the mapped location.</text>
+</svg>
     </div>
-  </section>
+    <p class="dcap">Because the mapping is piecewise affine, it follows local facial deformation, such as the stretching of a mouth corner during a smile, to the extent that the landmarks and the gaze are accurately estimated. The paper uses "deformation invariance" only in this limited sense.</p>
 
-  <section>
-    <div class="wrap pipeline">
+    <h3 style="margin-top:72px">Which face did the gaze land on?</h3>
+    <p class="lede" style="margin-top:12px">Many paradigms show several faces at once. Selecting faces for transformation decides which detected meshes are candidates. Every gaze sample is then labelled <code>on_face</code>, <code>off_face</code> or <code>unmapped</code> in the exported <code>gaze_region</code> column. The Visualization page can detect sections where facial meshes overlap and lets you review each ambiguous sample, assign it to a matching face or exclude it, without inferring which face is physically in front.</p>
+    <div class="dia">
+      <svg viewBox="0 128 960 360" role="img" aria-labelledby="d-assign-title d-assign-desc" xmlns="http://www.w3.org/2000/svg" style="min-width:960px">
+<title id="d-assign-title">How a gaze sample is classified</title>
+<desc id="d-assign-desc">A gaze sample is first tested against the facial meshes of all selected faces, then against peripheral triangles, and is labelled on_face, off_face or unmapped.</desc>
+<defs>
+<marker id="d-assign-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-muted"/></marker>
+<marker id="d-assign-aa" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" class="f-acc"/></marker>
+</defs>
+<rect y="128" width="960" height="360" class="f-paper"/>
+<line x1="172" y1="192" x2="220" y2="192" class="s-muted" stroke-width="1" marker-end="url(#d-assign-a)"/>
+<line x1="380" y1="192" x2="452" y2="192" class="s-acc" stroke-width="1" marker-end="url(#d-assign-aa)"/>
+<rect x="402" y="172" width="28" height="12" rx="2" class="f-paper"/>
+<text x="416" y="181" class="t-arrow" text-anchor="middle">YES</text>
+<line x1="300" y1="240" x2="300" y2="288" class="s-muted" stroke-width="1" marker-end="url(#d-assign-a)"/>
+<rect x="308" y="258" width="24" height="12" rx="2" class="f-paper"/>
+<text x="320" y="267" class="t-arrow" text-anchor="middle">NO</text>
+<line x1="380" y1="336" x2="452" y2="336" class="s-muted" stroke-width="1" marker-end="url(#d-assign-a)"/>
+<rect x="402" y="316" width="28" height="12" rx="2" class="f-paper"/>
+<text x="416" y="325" class="t-arrow" text-anchor="middle">YES</text>
+<line x1="300" y1="384" x2="300" y2="412" class="s-muted" stroke-width="1" marker-end="url(#d-assign-a)"/>
+<rect x="308" y="390" width="24" height="12" rx="2" class="f-paper"/>
+<text x="320" y="399" class="t-arrow" text-anchor="middle">NO</text>
+<rect x="24" y="168" width="148" height="48" rx="24" class="f-input s-soft" stroke-width="1"/>
+<text x="98" y="188" class="t-name" text-anchor="middle">Gaze sample</text>
+<text x="98" y="204" class="t-sub" text-anchor="middle">in frame f</text>
+<polygon points="220,192 300,144 380,192 300,240" class="f-paper"/>
+<polygon points="220,192 300,144 380,192 300,240" class="f-card s-ink" stroke-width="1" stroke-linejoin="round"/>
+<text x="300" y="190" class="t-name" text-anchor="middle">Inside a selected</text>
+<text x="300" y="206" class="t-name" text-anchor="middle">face mesh?</text>
+<polygon points="220,336 300,288 380,336 300,384" class="f-paper"/>
+<polygon points="220,336 300,288 380,336 300,384" class="f-card s-ink" stroke-width="1" stroke-linejoin="round"/>
+<text x="300" y="334" class="t-name" text-anchor="middle">Peripheral</text>
+<text x="300" y="350" class="t-name" text-anchor="middle">mapping usable?</text>
+<rect x="452" y="164" width="232" height="56" rx="6" class="f-paper"/>
+<rect x="452" y="164" width="232" height="56" rx="6" class="f-acct s-acc" stroke-width="1"/>
+<text x="568" y="190" class="t-name t-mono-name" text-anchor="middle">on_face</text>
+<text x="568" y="208" class="t-sub" text-anchor="middle">template coordinates + face_id</text>
+<rect x="452" y="308" width="232" height="56" rx="6" class="f-paper"/>
+<rect x="452" y="308" width="232" height="56" rx="6" class="f-card s-ink" stroke-width="1"/>
+<text x="568" y="334" class="t-name t-mono-name" text-anchor="middle">off_face</text>
+<text x="568" y="352" class="t-sub" text-anchor="middle">display coordinates · no face_id</text>
+<rect x="184" y="412" width="232" height="52" rx="6" class="f-paper"/>
+<rect x="184" y="412" width="232" height="52" rx="6" class="f-card s-ink" stroke-width="1"/>
+<text x="300" y="436" class="t-name t-mono-name" text-anchor="middle">unmapped</text>
+<text x="300" y="454" class="t-sub" text-anchor="middle">invalid or no usable mapping</text>
+<rect x="720" y="144" width="216" height="240" rx="8" class="f-paper2 s-rule" stroke-width="1"/>
+<text x="736" y="168" class="t-eye" text-anchor="start">ASSIGNMENT RULES</text>
+<text x="736" y="192" class="t-dotn" text-anchor="start">1</text>
+<text x="752" y="192" class="t-note" text-anchor="start">Facial triangles of all</text>
+<text x="752" y="206" class="t-note" text-anchor="start">selected faces come first.</text>
+<text x="736" y="232" class="t-dotn" text-anchor="start">2</text>
+<text x="752" y="232" class="t-note" text-anchor="start">If several faces match,</text>
+<text x="752" y="246" class="t-note" text-anchor="start">the first in ID order wins.</text>
+<text x="752" y="260" class="t-note" text-anchor="start">This is not a depth order.</text>
+<text x="736" y="286" class="t-dotn" text-anchor="start">3</text>
+<text x="752" y="286" class="t-note" text-anchor="start">Peripheral triangles come</text>
+<text x="752" y="300" class="t-note" text-anchor="start">later and are for display.</text>
+<text x="736" y="326" class="t-dotn" text-anchor="start">4</text>
+<text x="752" y="326" class="t-note" text-anchor="start">Template AOIs count</text>
+<text x="752" y="340" class="t-note" text-anchor="start">on_face samples only.</text>
+</svg>
+    </div>
+    <p class="dcap">Off-face gaze can carry task-relevant information. Examine it with stimulus-space AOIs in the original video coordinates, for example the region between two interlocutors. These AOIs are currently static, so they may not follow people who move.</p>
+  </div>
+</section>
+
+<!-- 05 TRACKING -->
+<section id="tracking" class="alt">
+  <div class="wrap">
+    <div class="split rev">
+      <figure>
+        <a class="fig" href="assets/fig6-tracking-outcomes.webp"><img src="assets/fig6-tracking-outcomes.webp" width="1242" height="940" loading="lazy" alt="Four video frames of an infant in a car seat showing correct, shifted, oversized and duplicate face detections"></a>
+        <figcaption><span class="tag">Paper figure 6</span><b>Face tracking outcomes in discontinuity scenarios.</b> (A) Expected detection. (B) Misaligned detection after occlusion or rapid movement. (C) Oversized detection capturing non-facial areas. (D) A spurious second face (orange) while the true face is still detected (green).</figcaption>
+      </figure>
       <div>
-        <h2>One pipeline, every tracker</h2>
-        <p class="sub" style="margin-bottom:16px">iTemplate2 does not depend on a particular eye tracker. You map your own columns (coordinates, timestamps, trial markers and stimulus names), and the app handles screen-based and wearable recordings alike.</p>
-        <div class="chips">
-          <span class="chip">Screen-based</span><span class="chip">Wearable</span><span class="chip">Videos</span><span class="chip">Images</span><span class="chip">Multi-face scenes</span>
-        </div>
-      </div>
-      <img src="assets/flowchart.webp" width="1600" height="1493" loading="lazy" alt="Flowchart of the iTemplate2 processing pipeline from project setup to export">
-    </div>
-  </section>
-
-  <section id="features" class="alt">
-    <div class="wrap">
-      <h2>Key features</h2>
-      <p class="sub">Built for researchers who work with faces in motion.</p>
-      <div class="features">
-        <div class="card"><h3>Dynamic and static stimuli</h3><p>Frame-by-frame transformation for videos, plus still face images, in the same project.</p></div>
-        <div class="card"><h3>Dense, automatic landmarks</h3><p>478 landmarks per face and frame, up to five faces at once, in place of semi-manual annotation of 39 points.</p></div>
-        <div class="card"><h3>Face ID management</h3><p>Merge, swap, label and remove face tracks (for example "Caregiver" and "Infant"), and review gaze on overlapping facial meshes.</p></div>
-        <div class="card"><h3>Templates</h3><p>Use the built-in average face, or choose a template from your own stimuli or an uploaded face image.</p></div>
-        <div class="card"><h3>Clear gaze classes</h3><p>Every sample is <code>on_face</code>, <code>off_face</code> or <code>unmapped</code>, with the attended <code>face_id</code>. A contour margin tolerates gaze just outside the face outline.</p></div>
-        <div class="card"><h3>Landmark quality control</h3><p>Find landmark gaps, set a maximum fill threshold, glue gaps by interpolation, and re-detect selected frame ranges.</p></div>
-        <div class="card"><h3>Snap-to-landmark AOIs</h3><p>Draw polygon AOIs anchored to the 478-point mesh, share them as JSON, or define AOIs in the original stimulus space.</p></div>
-        <div class="card"><h3>Heatmaps and playback</h3><p>Synchronised raw and template-space playback, grouped heatmaps with per-participant normalisation, and video and image export.</p></div>
-        <div class="card"><h3>Expression and head pose</h3><p>52 blendshape coefficients and 3D head pose per face, to study the stimulus face's expression alongside gaze.</p></div>
-        <div class="card"><h3>Flexible import</h3><p>Column mapping, stimulus-name cleaning and onset/offset trial segmentation with a configurable gaze response lag.</p></div>
-        <div class="card"><h3>Open and reproducible</h3><p>Python with no commercial dependencies, Parquet storage, saved settings and a timestamped log for every step.</p></div>
-        <div class="card"><h3>Screen-based and wearable</h3><p>Normalisation for scene-camera data, independent of the eye tracker's make or model.</p></div>
+        <span class="eyebrow">05 · Quality control</span>
+        <h2>Automatic detection, with a human in the loop</h2>
+        <p class="lede">A face can be missed or detected in the wrong place during occlusion, rapid head movement or extreme rotation, and tracking can swap or fragment IDs when a face reappears. Left uncorrected, gaze may be assigned to the wrong face or to incorrect locations.</p>
+        <p class="lede">iTemplate2 lets you inspect the affected frames, keep gaps as missing rather than interpolating across them, correct face IDs, remove unreliable detections, or re-run detection on a selected frame range. Corrected IDs can carry labels such as "Caregiver" and "Infant".</p>
+        <p class="lede">A <b>face contour margin</b> handles another source of error: because eye trackers have limited accuracy, gaze at the edge of a face can be recorded just outside the outline. The margin enlarges each outline by a chosen percentage during transformation, and is saved with the output so you can report it.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="methods">
-    <div class="wrap">
-      <h2>A complement to existing AOI methods</h2>
-      <p class="sub">Automatic and dynamic AOI tools already handle moving faces well. iTemplate2 adds a different way of working, and is not meant to replace them.</p>
-      <div class="features">
-        <div class="card"><h3>Keyframe AOIs</h3><p>Tools such as Tobii Pro Lab and EyeLink Data Viewer interpolate 2D position and scale between keyframes you define.</p></div>
-        <div class="card"><h3>Landmark-based AOIs</h3><p>Hessels et al. (2018) and FaceTrack-AOI (Zhou et al., 2026) build AOIs from landmarks detected in each frame, in the video's own coordinates.</p></div>
-        <div class="card"><h3>Template space</h3><p>iTemplate2 registers gaze to a common template, so AOIs are defined once, including regions that landmarks do not delineate directly, such as both eyes combined, the forehead or the cheeks. It also supports heatmaps and other spatial analyses.</p></div>
-      </div>
-      <p class="note" style="margin-top:20px">Template registration does not remove the decisions in AOI analysis. It moves some of them to the choice of template, the definition of AOIs on that template, and the inspection of facial detections. Validity still depends on your research question, your gaze data quality and the accuracy of the facial mapping.</p>
-    </div>
-  </section>
+<!-- 06 EXAMPLES -->
+<section id="examples">
+  <div class="wrap">
+    <span class="eyebrow">06 · Example applications</span>
+    <h2>Four developmental eye-tracking projects</h2>
+    <p class="lede">The paper uses these examples to show scope and feasibility. They are not benchmarks of accuracy against a ground truth.</p>
 
-  <section id="examples" class="alt">
-    <div class="wrap">
-      <h2>Example applications</h2>
-      <p class="sub">The paper illustrates the workflow with four developmental eye-tracking projects. These show scope and feasibility, not accuracy benchmarks.</p>
-      <div class="features">
-        <div class="card"><h3>Toddlers and emotional expressions</h3><p>Videos of actresses expressing emotion: one set of facial AOIs across actresses and across changing expressions.</p></div>
-        <div class="card"><h3>Live caregiver–infant interaction</h3><p>Dual eye tracking of both partners, with face ID checks after occlusion.</p></div>
-        <div class="card"><h3>Infant-directed speech and singing</h3><p>40 videos in one coordinate space, across 4, 6 and 12 months. Classifications differed from four manual coders in about 7% of frames, specific to this dataset.</p></div>
-        <div class="card"><h3>Free play at home</h3><p>Wearable eye trackers on caregivers and infants, with adult and infant faces summarised on the same template.</p></div>
+    <div class="ex" style="margin-top:36px">
+      <div class="n">1</div>
+      <div>
+        <h3>Toddlers and emotional expressions</h3>
+        <p>Fang and Xiao (2026) showed 12- to 24-month-old toddlers videos of actresses expressing emotions toward novel objects. Facial features moved continuously and varied across actresses, so fixed AOIs would likely have misclassified gaze. The 478-point mesh follows each expression, and snap-to-landmark AOIs give one consistent set of regions across actresses and emotions. The hand gesture in the figure at the top of this page is classified as off-face.</p>
       </div>
     </div>
-  </section>
 
-  <section id="care">
-    <div class="wrap">
-      <h2>Interpret results with care</h2>
-      <p class="sub">The transformation changes how gaze is represented. It does not change the gaze itself.</p>
-      <div class="features">
-        <div class="card"><h3>Gaze quality still limits you</h3><p>Transformation does not improve gaze accuracy or precision. In wearable and infant data, gaze error can match the distance between facial features, so be cautious near AOI boundaries.</p></div>
-        <div class="card"><h3>Landmarks are estimates</h3><p>Detection degrades with occlusion, head rotation beyond about ±70°, low resolution and poor light, and infant faces are under-represented in the model's training data.</p></div>
-        <div class="card"><h3>The template shapes the output</h3><p>The built-in template averages White female faces from the Chicago Face Database. It does not establish equal detection accuracy across ages or demographic groups.</p></div>
-        <div class="card"><h3>Off-face is not a face location</h3><p>Peripheral template coordinates are for display only. Use stimulus-space AOIs for gaze between or beyond faces; these are currently static.</p></div>
+    <div class="ex">
+      <div class="n">2</div>
+      <div>
+        <h3>Live caregiver–infant interaction</h3>
+        <p>Ripley et al. (2025) used dual eye tracking to capture the gaze of caregivers and 4- to 6-month-old infants during face-to-face communication. Each partner's face continuously shifts in scale, orientation and position, and caregivers lean in, turn away or are briefly occluded. iTemplate2's face ID controls and identity timeline let researchers merge tracks, swap IDs or mark gaps before transformation (see the tracking figure above).</p>
       </div>
-      <p class="note" style="margin-top:20px">Read more in <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md#interpreting-transformed-gaze">Interpreting Transformed Gaze</a>.</p>
     </div>
-  </section>
 
-  <section id="screens" class="alt">
-    <div class="wrap">
-      <h2>Screenshots</h2>
-      <p class="sub">Click an image to view it full size.</p>
-      <div class="gallery">
+    <div class="ex">
+      <div class="n">3</div>
+      <div>
+        <h3>Infant gaze to infant-directed speech and singing</h3>
+        <p>Román-Caballero et al. (2025) followed infants at 4, 6 and 12 months. Manual frame-by-frame AOIs were estimated at about 240 hours for this study. Mapping all 40 videos onto one template put gaze in a common space, even though infants contributed valid data for different videos at different ages. AOI classifications differed from four trained manual coders in about 7% of frames, and the transformed data showed the reported shift from eye to mouth preference by 12 months. The 7% figure describes agreement for this example only, not general accuracy. Other automated AOI methods could give the same comparison; the template additionally allowed common heatmaps.</p>
         <figure>
-          <a href="assets/project-manager.webp"><img src="assets/project-manager.webp" width="2000" height="1291" loading="lazy" alt="Project Manager screen"></a>
-          <figcaption><b>Project Manager.</b> Create a project, import gaze data and map columns.</figcaption>
-        </figure>
-        <figure>
-          <a href="assets/visualization.webp"><img src="assets/visualization.webp" width="2000" height="1291" loading="lazy" alt="Visualization screen with gaze playback and heatmap"></a>
-          <figcaption><b>Visualization.</b> Gaze playback on the stimulus alongside heatmaps.</figcaption>
-        </figure>
-        <figure>
-          <a href="assets/aoi-analysis.webp"><img src="assets/aoi-analysis.webp" width="2000" height="1290" loading="lazy" alt="AOI Analysis screen"></a>
-          <figcaption><b>AOI Analysis.</b> Draw areas of interest and compute gaze metrics.</figcaption>
-        </figure>
-        <figure>
-          <a href="assets/face-extraction.webp"><img src="assets/face-extraction.webp" width="2000" height="1291" loading="lazy" alt="Face Extraction screen with landmark overlay"></a>
-          <figcaption><b>Face Extraction.</b> Inspect landmarks and the Delaunay mesh frame by frame.</figcaption>
+          <a class="fig" href="assets/fig7-longitudinal.webp"><img src="assets/fig7-longitudinal.webp" width="1440" height="810" loading="lazy" alt="Bar charts comparing manual and iTemplate2 AOI classification at 4, 6 and 12 months, and template heatmaps at each age"></a>
+          <figcaption><span class="tag">Paper figure 7</span>(A) Distribution of infants' visual attention across AOIs from manual coding and from iTemplate2 at each age; classifications differed in about 7% of frames. (B) Heatmaps of infants' gaze at each age, with warmer colours showing higher gaze density.</figcaption>
         </figure>
       </div>
     </div>
-  </section>
 
-  <section id="install">
-    <div class="wrap">
-      <h2>Install and run</h2>
-      <p class="sub">Requires Python 3.10 to 3.13 on macOS, Windows or Linux. The face model and template are included.</p>
-      <div class="install">
-        <div>
-          <div class="code" data-copy><button class="copy" type="button">Copy</button><span class="c"># 1. Get the code</span>
+    <div class="ex">
+      <div class="n">4</div>
+      <div>
+        <h3>Face looking during free play at home</h3>
+        <p>Fully mobile infants (11 to 20 months) and their caregivers wore eye trackers during unconstrained play. Scene cameras captured cluttered rooms in which faces constantly change scale, orientation and position. Automatic detection tracks the faces, with optional manual checks, and gaze on adult and infant faces is summarised on the same template. This shared registration does not show that landmarks are detected equally well on adult and infant faces, and feature-level reading depends on whether wearable gaze accuracy is sufficient for the size of the faces in the scene video.</p>
+        <figure>
+          <a class="fig" href="assets/fig8-free-play.webp"><img src="assets/fig8-free-play.webp" width="850" height="534" loading="lazy" alt="Egocentric views from a caregiver and an infant during free play, with gaze mapped onto the template face and density heatmaps"></a>
+          <figcaption><span class="tag">Paper figure 8</span>Caregivers' and infants' face looking during natural free play at home. Green dots show original gaze on the egocentric views, red dots show transformed gaze on the template face, and heatmaps show gaze density on the template faces.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 COMPARE -->
+<section id="compare" class="alt">
+  <div class="wrap">
+    <span class="eyebrow">07 · Positioning</span>
+    <h2>A complement to existing AOI methods</h2>
+    <p class="lede">Automatic and dynamic AOI tools already handle moving faces well. iTemplate2 is a different way of working, and is not meant to replace them.</p>
+    <div class="cards" style="margin-top:28px">
+      <div class="card"><span class="num">KEYFRAME</span><h3>Keyframe AOIs</h3><p>Tobii Pro Lab and EyeLink Data Viewer interpolate 2D translation and scaling between keyframes you define. Between keyframes they do not follow non-rigid deformation or 3D head rotation.</p></div>
+      <div class="card"><span class="num">LANDMARK</span><h3>Landmark-based AOIs</h3><p>Hessels et al. (2018) and FaceTrack-AOI (Zhou et al., 2026) build AOIs from landmarks detected in each frame, in the coordinates of the original video.</p></div>
+      <div class="card"><span class="num">TEMPLATE</span><h3>Template space</h3><p>iTemplate2 registers gaze to a common template, so AOIs are defined once, including regions landmarks do not delineate directly, such as both eyes combined, the forehead or the cheeks. It also supports heatmaps and spatial analysis, and pairs with pixel-wise statistics such as iMap4.</p></div>
+    </div>
+    <p class="note" style="margin-top:24px">Template registration does not remove the decisions in AOI analysis. It moves some of them to the choice of template, the definition of AOIs on it, and the inspection of facial detections. Validity still depends on your research question, your gaze data quality and the accuracy of the facial mapping.</p>
+  </div>
+</section>
+
+<!-- 08 CARE -->
+<section id="care">
+  <div class="wrap">
+    <span class="eyebrow">08 · Limits</span>
+    <h2>Interpret results with care</h2>
+    <p class="lede">The transformation changes how gaze is represented. It does not change the gaze itself.</p>
+    <div class="cards" style="margin-top:28px">
+      <div class="card"><h3>Gaze quality still limits you</h3><p>Transformation does not improve accuracy or precision. In wearable and infant data, gaze error can match the distance between facial features, so be cautious near AOI boundaries and check whether conclusions change with the boundaries.</p></div>
+      <div class="card"><h3>Landmarks are estimates</h3><p>Detection degrades with occlusion, head rotation beyond about ±70°, low resolution and poor light. Infant faces are under-represented in the model's training data, so allow extra time for quality control.</p></div>
+      <div class="card"><h3>The template shapes the output</h3><p>The built-in template averages White female faces from the Chicago Face Database. It places faces of different shapes in one space but does not establish equal accuracy across ages or demographic groups. Custom templates are supported.</p></div>
+      <div class="card"><h3>Off-face is not a face location</h3><p>Peripheral template coordinates are for display only. Use stimulus-space AOIs for gaze between or beyond faces; these are currently static, and fully automatic identity tracking in crowded scenes is unresolved.</p></div>
+    </div>
+    <p class="note" style="margin-top:24px">More in <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md#interpreting-transformed-gaze">Interpreting Transformed Gaze</a>.</p>
+  </div>
+</section>
+
+<!-- 09 INSTALL -->
+<section id="install" class="alt">
+  <div class="wrap">
+    <span class="eyebrow">09 · Get started</span>
+    <h2>Install and run</h2>
+    <p class="lede">Requires Python 3.10 to 3.13 on macOS, Windows or Linux. The face model and template are included in the repository.</p>
+    <div class="install" style="margin-top:28px">
+      <div>
+        <div class="code" data-copy><button class="copy" type="button">Copy</button><span class="c"># 1. Get the code</span>
 git clone https://github.com/McMaster-Baby-Lab/iTemplate2-public.git
 cd iTemplate2-public
 
@@ -278,33 +658,77 @@ python -m pip install -r requirements.txt
 
 <span class="c"># 3. Launch</span>
 python start_gui.py</div>
-        </div>
-        <div>
-          <p class="note"><b>Prefer conda?</b> Run <code>conda env create -f environment.yml</code> and <code>conda activate iTemplate2</code> instead of step 2.</p>
-          <p class="note"><b>Linux:</b> install <code>xcb-util-cursor</code> first (PyQt6 requirement).</p>
-          <p class="note"><b>New to the app?</b> Read <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md#before-you-begin-know-your-data">Before You Begin</a> to check that you know your data's columns, timing and stimulus names, then follow Steps 0 to 6 in the sidebar.</p>
-          <p style="margin-top:20px"><a class="btn primary" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">Read the user guide</a></p>
-        </div>
+      </div>
+      <div>
+        <p class="note"><b>Prefer conda?</b> Run <code>conda env create -f environment.yml</code> and <code>conda activate iTemplate2</code> instead of step 2.</p>
+        <p class="note"><b>Linux:</b> install <code>xcb-util-cursor</code> first (a PyQt6 requirement).</p>
+        <p class="note"><b>New to the app?</b> Read <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md#before-you-begin-know-your-data">Before You Begin</a> to check that you know your data's columns, timing and stimulus names, then follow Steps 0 to 6 in the sidebar.</p>
+        <p style="margin-top:20px"><a class="btn primary" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">Read the user guide</a></p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="cite" class="alt">
-    <div class="wrap">
-      <h2>Cite iTemplate2</h2>
-      <p class="sub">If iTemplate2 helps your research, please cite the paper. The original method is described in Xiao &amp; Lee (2018).</p>
-      <blockquote>Xiao, N. G., Román-Caballero, R., Fang, W., Ripley, S., Han, D., &amp; Trainor, L. J. (in press). iTemplate2: An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.</blockquote>
-      <blockquote>Xiao, N. G., &amp; Lee, K. (2018). iTemplate: A template-based eye movement data analysis approach. <i>Behavior Research Methods, 50</i>(6), 2388–2398. <a href="https://doi.org/10.3758/s13428-018-1015-x">https://doi.org/10.3758/s13428-018-1015-x</a></blockquote>
-      <!-- TODO: add journal, volume, year and DOI once available -->
-      <p class="note">Questions or bug reports? Open an <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">issue on GitHub</a>.</p>
+<!-- 10 CITE + AUTHORS -->
+<section id="authors">
+  <div class="wrap">
+    <span class="eyebrow">10 · Cite and credits</span>
+    <h2>Cite iTemplate2</h2>
+    <div class="quote" style="font-size:1.15rem">Xiao, N. G., Román-Caballero, R., Fang, W., Ripley, S., Han, D., &amp; Trainor, L. J. (in press). iTemplate2: An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.<cite>Paper · in press</cite></div>
+    <!-- TODO: add journal, volume, year and DOI once available -->
+    <div class="quote" style="font-size:1.05rem;border-color:var(--rule-solid)">Xiao, N. G., &amp; Lee, K. (2018). iTemplate: A template-based eye movement data analysis approach. <i>Behavior Research Methods, 50</i>(6), 2388–2398. <a href="https://doi.org/10.3758/s13428-018-1015-x">doi.org/10.3758/s13428-018-1015-x</a><cite>Original method</cite></div>
+
+    <h2 style="margin-top:72px">The team</h2>
+    <div class="authors">
+      <div class="author"><h3>Naiqi G. Xiao <sup>1</sup><span class="badge-c">Corresponding</span></h3><p class="role">Conceived the software framework, led software development and wrote the manuscript.</p></div>
+      <div class="author"><h3>Rafael Román-Caballero <sup>1, 2</sup></h3><p class="role">Contributed to software development, testing and manuscript preparation.</p></div>
+      <div class="author"><h3>Wei Fang <sup>1</sup></h3><p class="role">Contributed to software testing and validation, and manuscript preparation.</p></div>
+      <div class="author"><h3>Sara Ripley <sup>1</sup></h3><p class="role">Contributed to application testing and manuscript preparation.</p></div>
+      <div class="author"><h3>Danyang Han <sup>3</sup></h3><p class="role">Contributed to software validation and manuscript preparation.</p></div>
+      <div class="author"><h3>Laurel J. Trainor <sup>1</sup></h3><p class="role">Contributed to conceptual development and revised the manuscript.</p></div>
     </div>
-  </section>
+    <ul class="affil">
+      <li><b>1</b><span>Department of Psychology, Neuroscience &amp; Behaviour, McMaster University, Canada</span></li>
+      <li><b>2</b><span>Department of Experimental Psychology, University of Granada, Spain</span></li>
+      <li><b>3</b><span>Department of Psychology and Behavioral Sciences, Zhejiang University, China</span></li>
+    </ul>
+    <div class="corr">
+      <span class="eyebrow">Corresponding author</span>
+      <p><strong>Naiqi G. Xiao, Ph.D.</strong><br>Department of Psychology, Neuroscience &amp; Behaviour, McMaster University, 1280 Main St W, Hamilton, ON, Canada L8S 4L8<br><a href="mailto:nx@mcmaster.ca">nx@mcmaster.ca</a></p>
+    </div>
+
+    <div class="fund">
+      <div>
+        <h3>Funding</h3>
+        <p>Supported by the Social Sciences and Humanities Research Council of Canada (435-2022-0838 and 435-2020-0442), the Natural Sciences and Engineering Research Council of Canada (RGPIN-2020-07129 and RGPIN-2019-05416), the Canadian Institute for Advanced Research, the National Natural Science Foundation of China (32400886), and the European Union's Horizon 2020 research and innovation programme under a Marie Skłodowska-Curie Actions Global Postdoctoral Fellowship (project 101149355).</p>
+      </div>
+      <div>
+        <h3>Acknowledgements</h3>
+        <p>We thank the research students and volunteers who helped test the software and create figures: Lorena Morcone, Emma Whittier, Grace Kakarelis, Muhan (Joanne) Liu, Maya Krieger, Selena Li, Emma Resendes, Meg Lyu, Maya Mammon, Olive Rinaldi, Leqi Feng and Fei Yang.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAB BAND -->
+<section class="alt" style="padding:0">
+  <div class="wrap labband">
+    <a class="logo" href="https://babylab.mcmaster.ca" aria-label="McMaster Baby Lab website"><img src="assets/mcmaster-baby-lab.webp" width="200" height="141" loading="lazy" alt="McMaster Baby Lab logo: a hatching eaglet"></a>
+    <div>
+      <span class="eyebrow">Developed at</span>
+      <h2>The McMaster Baby Lab</h2>
+      <p class="lede" style="margin-bottom:14px">iTemplate2 is developed by researchers at the McMaster Baby Lab, McMaster University. Learn more about the lab and its work on the lab website.</p>
+      <a class="btn" href="https://babylab.mcmaster.ca">Visit babylab.mcmaster.ca</a>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <footer>
   <div class="wrap">
-    <div>Developed by Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Rafael Román-Caballero, Dr. Wei Fang, Sara Ripley, Dr. Danyang Han and Dr. Laurel J. Trainor.<br>McMaster Baby Lab, McMaster University, with the University of Granada and Zhejiang University.<br>Supported by SSHRC, NSERC, CIFAR, NSFC and the EU Horizon 2020 programme (MSCA). Full funding details are in the <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public#funding-and-acknowledgements">README</a>.</div>
-    <div><a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">GitHub</a> · <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">Issues</a></div>
+    <div>iTemplate2 · McMaster Baby Lab, McMaster University · with the University of Granada and Zhejiang University</div>
+    <div><a href="https://babylab.mcmaster.ca">babylab.mcmaster.ca</a> · <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">GitHub</a> · <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">Issues</a></div>
   </div>
 </footer>
 
