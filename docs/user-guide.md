@@ -134,6 +134,8 @@ The file browser in the middle shows the project contents and lets you inspect t
 
 Extracts facial landmarks from your stimulus videos or images using MediaPipe's Face Landmarker.
 
+![Face Extraction screen](assets/face-extraction.webp)
+
 This page is where you prepare and inspect stimulus landmarks:
 
 - The **Select Video** dropdown switches between stimuli in the `stimuli/` folder.
@@ -500,6 +502,8 @@ A study-specific template changes the reference geometry; it does not improve th
 ### Step 4: Visualization
 
 Provides interactive playback of stimulus videos/images overlaid with gaze data, plus heatmap distribution plots.
+
+![Visualization screen](assets/visualization.webp)
 
 This page is split into two working areas:
 

@@ -4,7 +4,7 @@
 
 [Project page](https://mcmaster-baby-lab.github.io/iTemplate2-public/) · [User guide](docs/user-guide.md) · [Report an issue](https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues)
 
-![iTemplate2 AOI analysis screen showing areas of interest drawn on the template face](docs/assets/aoi-analysis.webp)
+![iTemplate2 face extraction screen](docs/assets/face-extraction.webp)
 
 iTemplate2 co-registers eye-tracking gaze data onto a normalised face template. It lets researchers analyse where participants looked on **dynamic face stimuli (videos)** or **static face images**, even when faces move, turn, or share the scene with other people. A full desktop GUI walks you through the whole pipeline, from importing raw gaze data to exporting analysis-ready tables.
 
