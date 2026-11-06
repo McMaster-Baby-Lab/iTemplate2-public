@@ -120,7 +120,7 @@ The [user guide](docs/user-guide.md) covers every step, the parameter reference,
 | [Gap management](docs/gap_management.md) | Understanding landmark gaps, choosing a threshold, using the glue tool |
 | [Architecture](docs/architecture.md) | Code layout and the `core/` modules for developers |
 
-<!-- TODO: add the public OSF link for example datasets and video tutorials once available -->
+The software is also archived on the [Open Science Framework](https://osf.io/54v9e/), the project cited in the paper.
 
 ## Citation
 

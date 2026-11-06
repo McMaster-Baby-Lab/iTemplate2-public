@@ -28,6 +28,10 @@ authors:
 repository-code: "https://github.com/McMaster-Baby-Lab/iTemplate2-public"
 url: "https://mcmaster-baby-lab.github.io/iTemplate2-public/"
 license: GPL-3.0-or-later
+identifiers:
+  - type: url
+    value: "https://osf.io/54v9e/"
+    description: "OSF project cited in the paper"
 keywords:
   - eye tracking
   - face processing
