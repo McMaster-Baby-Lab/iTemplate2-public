@@ -1,0 +1,20 @@
+# iTemplate2 dependencies — major versions pinned, ranges allow minor/patch updates
+# After a successful install, lock exact versions: pip freeze > requirements.txt
+
+numpy>=2.0.0,<3.0.0
+pandas>=2.2.0,<3.0.0
+pyarrow>=17.0.0,<21.0.0
+matplotlib>=3.9.0,<4.0.0
+seaborn>=0.13.0,<1.0.0
+scikit-learn>=1.6.0,<2.0.0
+scipy>=1.14.0,<2.0.0
+h5py>=3.12.0,<4.0.0
+numba>=0.60.0,<1.0.0
+tqdm>=4.66.0,<5.0.0
+pillow>=11.0.0,<12.0.0
+jupyter>=1.0.0,<2.0.0
+mediapipe>=0.10.21,<0.11.0
+matplotlib-venn>=1.1.1,<2.0.0
+ipympl>=0.10.0,<1.0.0
+opencv-python-headless>=4.10.0,<5.0.0
+PyQt6>=6.7.0,<7.0.0

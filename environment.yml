@@ -1,0 +1,25 @@
+name: iTemplate2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - pyarrow
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - scipy
+  - h5py
+  - numba
+  - pip
+  - tqdm
+  - pillow
+  - jupyter
+  - pip:
+      - mediapipe
+      - matplotlib-venn
+      - ipympl
+      - opencv-python-headless
+      - PyQt6
