@@ -165,6 +165,9 @@ svg text{fill:var(--ink)}
 @media(max-width:860px){.fund{grid-template-columns:1fr}}
 .fund h3{font-size:1.3rem;margin-bottom:10px}
 .fund p{font-size:.92rem;color:var(--muted)}
+.fund ul{margin:0;padding-left:1.2em;font-size:.92rem;color:var(--muted)}
+.fund li{margin:0 0 8px}
+.fund li::marker{color:var(--accent)}
 
 /* lab band + footer */
 .labband{display:grid;grid-template-columns:auto 1fr;gap:36px;align-items:center;padding:48px 0}
@@ -703,7 +706,14 @@ python start_gui.py</div>
     <div class="fund">
       <div>
         <h3>Funding</h3>
-        <p>Supported by the Social Sciences and Humanities Research Council of Canada (435-2022-0838 and 435-2020-0442), the Natural Sciences and Engineering Research Council of Canada (RGPIN-2020-07129 and RGPIN-2019-05416), the Canadian Institute for Advanced Research, the National Natural Science Foundation of China (32400886), and the European Union's Horizon 2020 research and innovation programme under a Marie Skłodowska-Curie Actions Global Postdoctoral Fellowship (project 101149355).</p>
+        <p>This work was supported by the following. Initials show the grant holder.</p>
+        <ul>
+          <li>Social Sciences and Humanities Research Council of Canada (SSHRC): grants 435-2022-0838 (N.G.X.) and 435-2020-0442 (L.J.T.)</li>
+          <li>Natural Sciences and Engineering Research Council of Canada (NSERC): grants RGPIN-2020-07129 (N.G.X.) and RGPIN-2019-05416 (L.J.T.)</li>
+          <li>Canadian Institute for Advanced Research (CIFAR): awarded to L.J.T.</li>
+          <li>National Natural Science Foundation of China: grant 32400886 (D.H.)</li>
+          <li>European Union's Horizon 2020 research and innovation programme, Marie Skłodowska-Curie Actions Global Postdoctoral Fellowship: project 101149355 (R.R.-C.)</li>
+        </ul>
       </div>
       <div>
         <h3>Acknowledgements</h3>

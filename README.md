@@ -142,7 +142,13 @@ Developed by Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Rafael Román-
 
 ## Funding and acknowledgements
 
-This work was supported by the Social Sciences and Humanities Research Council of Canada (grants 435-2022-0838 and 435-2020-0442), the Natural Sciences and Engineering Research Council of Canada (RGPIN-2020-07129 and RGPIN-2019-05416), the Canadian Institute for Advanced Research, the National Natural Science Foundation of China (32400886), and the European Union's Horizon 2020 research and innovation programme under a Marie Skłodowska-Curie Actions Global Postdoctoral Fellowship (project 101149355).
+This work was supported by the following. Initials show the grant holder.
+
+- Social Sciences and Humanities Research Council of Canada (SSHRC): grants 435-2022-0838 (N.G.X.) and 435-2020-0442 (L.J.T.)
+- Natural Sciences and Engineering Research Council of Canada (NSERC): grants RGPIN-2020-07129 (N.G.X.) and RGPIN-2019-05416 (L.J.T.)
+- Canadian Institute for Advanced Research (CIFAR): awarded to L.J.T.
+- National Natural Science Foundation of China: grant 32400886 (D.H.)
+- European Union's Horizon 2020 research and innovation programme, Marie Skłodowska-Curie Actions Global Postdoctoral Fellowship: project 101149355 (R.R.-C.)
 
 We thank the research students and volunteers who helped test the software and create figures: Lorena Morcone, Emma Whittier, Grace Kakarelis, Muhan (Joanne) Liu, Maya Krieger, Selena Li, Emma Resendes, Meg Lyu, Maya Mammon, Olive Rinaldi, Leqi Feng and Fei Yang.
 
