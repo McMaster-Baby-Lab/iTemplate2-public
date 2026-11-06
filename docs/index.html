@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iTemplate2 – Eye-movement analysis for dynamic faces</title>
+<meta name="description" content="iTemplate2 is an open-source Python toolbox with a desktop GUI that maps eye-tracking gaze data onto a normalised face template for videos and images.">
+<meta property="og:title" content="iTemplate2">
+<meta property="og:description" content="An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mcmaster-baby-lab.github.io/iTemplate2-public/">
+<meta property="og:image" content="https://mcmaster-baby-lab.github.io/iTemplate2-public/assets/aoi-analysis.webp">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root{
+  --bg:#ffffff; --bg-alt:#f4f7f9; --surface:#ffffff; --text:#1c2730; --muted:#5a6b77;
+  --line:#dde5ea; --accent:#2b6f8c; --accent-strong:#1f5871; --accent-soft:#e4f0f5; --on-accent:#ffffff;
+  --code-bg:#14202a; --code-text:#e6eef3; --shadow:0 10px 30px rgba(20,40,55,.12);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#10181e; --bg-alt:#152029; --surface:#19252e; --text:#e8eff3; --muted:#9db0bc;
+    --line:#26363f; --accent:#6fb6d2; --accent-strong:#8ac8e0; --accent-soft:#1b323d; --on-accent:#0c1a22;
+    --code-bg:#0a1319; --code-text:#e6eef3; --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+a:hover{color:var(--accent-strong)}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.sr{position:absolute;left:-9999px}
+
+/* header */
+header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.brand{font-weight:700;font-size:1.15rem;color:var(--text);text-decoration:none;letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+nav{display:flex;gap:20px;align-items:center;font-size:.95rem;overflow-x:auto}
+nav a{color:var(--muted);text-decoration:none;white-space:nowrap}
+nav a:hover{color:var(--text)}
+nav a.gh{color:var(--text);font-weight:600;border:1px solid var(--line);padding:5px 12px;border-radius:8px}
+@media(max-width:700px){nav a.opt{display:none}}
+
+/* hero */
+.hero{padding:64px 0 24px;text-align:center}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-soft);padding:4px 12px;border-radius:999px}
+h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.1;margin:18px 0 14px;letter-spacing:-.025em}
+.lead{font-size:clamp(1.05rem,2.2vw,1.25rem);color:var(--muted);max-width:720px;margin:0 auto 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn{display:inline-block;padding:11px 22px;border-radius:10px;font-weight:600;text-decoration:none;
+  border:1px solid var(--line);color:var(--text);background:var(--surface)}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:var(--on-accent)}
+.shot{margin:44px auto 0;max-width:980px}
+.shot img{border-radius:14px;border:1px solid var(--line);box-shadow:var(--shadow)}
+
+/* sections */
+section{padding:72px 0}
+section.alt{background:var(--bg-alt);border-block:1px solid var(--line)}
+h2{font-size:clamp(1.6rem,3.5vw,2.1rem);line-height:1.2;margin:0 0 10px;letter-spacing:-.02em}
+.sub{color:var(--muted);max-width:680px;margin:0 0 36px}
+.center{text-align:center}.center .sub{margin-inline:auto}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;counter-reset:s;padding:0;list-style:none;margin:0}
+.steps li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  background:var(--accent-soft);color:var(--accent-strong);font-weight:700;font-size:.9rem;margin-bottom:12px}
+.steps b{display:block;margin-bottom:4px}
+.steps span{color:var(--muted);font-size:.95rem}
+
+.pipeline{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
+.pipeline img{border-radius:14px;border:1px solid var(--line);background:#fff}
+@media(max-width:800px){.pipeline{grid-template-columns:1fr}}
+
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card h3{margin:0 0 6px;font-size:1.05rem}
+.card p{margin:0;color:var(--muted);font-size:.95rem}
+
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+figure{margin:0}
+figure a{display:block;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
+figure img{transition:transform .25s}
+figure a:hover img{transform:scale(1.02)}
+figcaption{margin-top:10px;font-size:.92rem;color:var(--muted)}
+figcaption b{color:var(--text)}
+
+/* code */
+.code{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:12px;padding:18px 20px;
+  font:.88rem/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;margin:0 0 16px;white-space:pre}
+.code .c{color:#7f95a3}
+.copy{position:absolute;top:10px;right:10px;font:600 .75rem system-ui,sans-serif;background:#ffffff1a;color:#e6eef3;
+  border:1px solid #ffffff33;border-radius:6px;padding:4px 10px;cursor:pointer}
+.copy:hover{background:#ffffff33}
+.install{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+@media(max-width:800px){.install{grid-template-columns:1fr}}
+.note{font-size:.92rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font-size:.82rem;padding:3px 11px;border-radius:999px;background:var(--accent-soft);color:var(--accent-strong);font-weight:600}
+
+blockquote{margin:0 0 16px;padding:16px 20px;border-left:4px solid var(--accent);background:var(--surface);
+  border-radius:0 10px 10px 0;border-block:1px solid var(--line);border-right:1px solid var(--line)}
+
+footer{padding:40px 0 56px;border-top:1px solid var(--line);color:var(--muted);font-size:.92rem}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top">i<span>Template</span>2</a>
+    <nav aria-label="Primary">
+      <a class="opt" href="#how">How it works</a>
+      <a class="opt" href="#features">Features</a>
+      <a class="opt" href="#screens">Screenshots</a>
+      <a href="#install">Install</a>
+      <a class="opt" href="#cite">Cite</a>
+      <a class="gh" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <span class="eyebrow">Open-source · Python · Desktop GUI</span>
+    <h1>See where participants looked on moving faces</h1>
+    <p class="lead">iTemplate2 maps eye-tracking gaze data onto a normalised face template, so you can analyse looking behaviour on <b>dynamic face videos</b> and <b>static images</b> without hand-coding frames.</p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Get started</a>
+      <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">User guide</a>
+      <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">View on GitHub</a>
+    </div>
+    <div class="shot">
+      <img src="assets/aoi-analysis.webp" width="2000" height="1290" alt="iTemplate2 AOI analysis screen with eye and mouth areas of interest drawn on the template face">
+    </div>
+  </div>
+
+  <section id="how" class="alt">
+    <div class="wrap">
+      <div class="center">
+        <h2>From raw gaze to analysis-ready data</h2>
+        <p class="sub">A guided, step-by-step workflow takes you through the whole pipeline inside one app.</p>
+      </div>
+      <ol class="steps">
+        <li><b>Extract faces</b><span>MediaPipe finds facial landmarks in every frame of your videos or images, with gap detection and repair.</span></li>
+        <li><b>Map gaze</b><span>Raw gaze coordinates are transformed into a common template face space.</span></li>
+        <li><b>Visualise</b><span>Play gaze over the stimulus and build heatmaps, normalised per participant.</span></li>
+        <li><b>Analyse AOIs</b><span>Draw areas of interest on the template or the stimulus and compute gaze metrics.</span></li>
+        <li><b>Export</b><span>Save the columns you need to CSV for your statistics software.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap pipeline">
+      <div>
+        <h2>One pipeline, every tracker</h2>
+        <p class="sub" style="margin-bottom:16px">iTemplate2 does not depend on a particular eye tracker. You map your own columns (coordinates, timestamps, trial markers and stimulus names), and the app handles screen-based and wearable recordings alike.</p>
+        <div class="chips">
+          <span class="chip">Screen-based</span><span class="chip">Wearable</span><span class="chip">Videos</span><span class="chip">Images</span><span class="chip">Multi-face scenes</span>
+        </div>
+      </div>
+      <img src="assets/flowchart.webp" width="1600" height="1493" loading="lazy" alt="Flowchart of the iTemplate2 processing pipeline from project setup to export">
+    </div>
+  </section>
+
+  <section id="features" class="alt">
+    <div class="wrap">
+      <h2>Key features</h2>
+      <p class="sub">Built for researchers who work with faces in motion.</p>
+      <div class="features">
+        <div class="card"><h3>Dynamic and static stimuli</h3><p>Process videos frame by frame or work with still face images in the same project.</p></div>
+        <div class="card"><h3>Multi-face scenes</h3><p>Select faces to analyse, and review frames where facial regions overlap with an auditable decision log.</p></div>
+        <div class="card"><h3>Custom templates</h3><p>Use the built-in average face, or choose a template face from your own stimuli or an uploaded image.</p></div>
+        <div class="card"><h3>Landmark quality control</h3><p>Find landmark gaps, set a maximum fill threshold, and glue gaps by interpolation.</p></div>
+        <div class="card"><h3>Heatmaps and playback</h3><p>Interactive gaze overlays and grouped heatmaps with video and image export.</p></div>
+        <div class="card"><h3>Dual-context AOIs</h3><p>Define AOIs on the template face or on the original stimulus, then compute metrics per AOI.</p></div>
+        <div class="card"><h3>Flexible import</h3><p>Column mapping, stimulus-name cleaning and temporal preprocessing with onset/offset trial segmentation.</p></div>
+        <div class="card"><h3>Reproducible projects</h3><p>Saved settings, deterministic output names and a timestamped processing log for every step.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="wrap">
+      <h2>Screenshots</h2>
+      <p class="sub">Click an image to view it full size.</p>
+      <div class="gallery">
+        <figure>
+          <a href="assets/project-manager.webp"><img src="assets/project-manager.webp" width="2000" height="1291" loading="lazy" alt="Project Manager screen"></a>
+          <figcaption><b>Project Manager.</b> Create a project, import gaze data and map columns.</figcaption>
+        </figure>
+        <figure>
+          <a href="assets/aoi-analysis.webp"><img src="assets/aoi-analysis.webp" width="2000" height="1290" loading="lazy" alt="AOI Analysis screen"></a>
+          <figcaption><b>AOI Analysis.</b> Draw areas of interest and compute gaze metrics.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" class="alt">
+    <div class="wrap">
+      <h2>Install and run</h2>
+      <p class="sub">Requires Python 3.10 to 3.13 on macOS, Windows or Linux. The face model and template are included.</p>
+      <div class="install">
+        <div>
+          <div class="code" data-copy><button class="copy" type="button">Copy</button><span class="c"># 1. Get the code</span>
+git clone https://github.com/McMaster-Baby-Lab/iTemplate2-public.git
+cd iTemplate2-public
+
+<span class="c"># 2. Create an environment</span>
+python -m venv .venv
+source .venv/bin/activate   <span class="c"># Windows: .venv\Scripts\activate</span>
+python -m pip install -r requirements.txt
+
+<span class="c"># 3. Launch</span>
+python start_gui.py</div>
+        </div>
+        <div>
+          <p class="note"><b>Prefer conda?</b> Run <code>conda env create -f environment.yml</code> and <code>conda activate iTemplate2</code> instead of step 2.</p>
+          <p class="note"><b>Linux:</b> install <code>xcb-util-cursor</code> first (PyQt6 requirement).</p>
+          <p class="note"><b>New to the app?</b> Read <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md#before-you-begin-know-your-data">Before You Begin</a> to check that you know your data's columns, timing and stimulus names, then follow Steps 0 to 6 in the sidebar.</p>
+          <p style="margin-top:20px"><a class="btn primary" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">Read the user guide</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cite">
+    <div class="wrap">
+      <h2>Cite iTemplate2</h2>
+      <p class="sub">If iTemplate2 helps your research, please cite the paper.</p>
+      <blockquote>Xiao, N. G., Román-Caballero, R., Fang, W., Ripley, S., Han, D., &amp; Trainor, L. J. (in press). iTemplate2: An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.</blockquote>
+      <!-- TODO: add journal, volume, year and DOI once available -->
+      <p class="note">Questions or bug reports? Open an <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">issue on GitHub</a>.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Developed by Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Wei Fang, Dr. Rafael Román-Caballero, Sara Ripley and Dr. Laurel J. Trainor.<br>McMaster Baby Lab, McMaster University.</div>
+    <div><a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">GitHub</a> · <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">Issues</a></div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('[data-copy]').forEach(function(box){
+  var btn = box.querySelector('.copy');
+  btn.addEventListener('click', function(){
+    var text = box.innerText.replace(/^Copy\n?/, '').trim();
+    var done = function(){ btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500); };
+    if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, function(){}); }
+  });
+});
+</script>
+</body>
+</html>
