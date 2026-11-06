@@ -2,7 +2,7 @@
 
 **An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.**
 
-[Project page](https://mcmaster-baby-lab.github.io/iTemplate2-public/) · [User guide](docs/user-guide.md) · [Report an issue](https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues)
+[Project page](https://mcmaster-baby-lab.github.io/iTemplate2-public/) · [User guide](docs/user-guide.md) · [Report an issue](https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues) · [License: GPL v3](LICENSE)
 
 ![iTemplate2 face extraction screen](docs/assets/face-extraction.webp)
 
@@ -128,7 +128,9 @@ If you use iTemplate2 in your research, please cite:
 
 > Xiao, N. G., Román-Caballero, R., Fang, W., Ripley, S., Han, D., & Trainor, L. J. (in press). iTemplate2: An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.
 
-<!-- TODO: add journal, volume, year and DOI once available -->
+<!-- TODO: add journal, volume, year and DOI once available (also in CITATION.cff) -->
+
+GitHub's **Cite this repository** button, in the sidebar, uses [`CITATION.cff`](CITATION.cff).
 
 The original method is described in:
 
@@ -150,5 +152,12 @@ Questions, bug reports and feature requests are welcome on the [issue tracker](h
 
 ## License
 
-<!-- TODO: choose a license and add a LICENSE file -->
-A license has not been chosen yet. Until a `LICENSE` file is added to this repository, all rights are reserved by the authors.
+iTemplate2 is free software, released under the [GNU General Public License v3.0 or later](LICENSE) (`GPL-3.0-or-later`). You may use, study, share and modify it for any purpose, including research and commercial work.
+
+- **Your data and results are not affected.** Analysing data with iTemplate2 does not make your data, figures or outputs subject to the GPL.
+- **If you distribute it,** including a modified version or software that incorporates iTemplate2, you must release that software under the same license and make its source code available.
+- **No warranty.** iTemplate2 comes with ABSOLUTELY NO WARRANTY, as set out in the license.
+
+The graphical interface uses [PyQt6](https://www.riverbankcomputing.com/software/pyqt/), which is available under the GPL v3, and the other dependencies use licenses that are compatible with it.
+
+Copyright © 2026 the iTemplate2 authors.

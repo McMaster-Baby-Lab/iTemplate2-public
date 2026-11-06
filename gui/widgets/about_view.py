@@ -107,6 +107,22 @@ class AboutView(QWidget):
         link.setStyleSheet("font-size: 13px;")
         layout.addWidget(link)
 
+        # License (GPL asks interactive programs to show a short notice)
+        lic_title = QLabel("License")
+        lic_title.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
+        layout.addWidget(lic_title)
+
+        lic = QLabel(
+            'iTemplate2 is free software, licensed under the '
+            '<a href="https://www.gnu.org/licenses/gpl-3.0.html" '
+            f'style="color: {text_accent};">GNU General Public License v3 or later</a>. '
+            "It comes with ABSOLUTELY NO WARRANTY."
+        )
+        lic.setWordWrap(True)
+        lic.setOpenExternalLinks(True)
+        lic.setStyleSheet("font-size: 13px;")
+        layout.addWidget(lic)
+
         # Spacer
         layout.addStretch()
 

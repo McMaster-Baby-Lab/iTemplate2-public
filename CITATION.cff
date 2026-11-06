@@ -1,0 +1,73 @@
+cff-version: 1.2.0
+message: "If you use iTemplate2 in your research, please cite the paper below."
+type: software
+title: "iTemplate2"
+abstract: >-
+  iTemplate2 is an open-source Python toolbox with a desktop GUI that maps
+  eye-tracking gaze data onto a canonical face template, frame by frame, for
+  videos, static images, and screen-based or wearable eye-tracking recordings.
+authors:
+  - family-names: Xiao
+    given-names: Naiqi G.
+    affiliation: "Department of Psychology, Neuroscience & Behaviour, McMaster University, Canada"
+  - family-names: Román-Caballero
+    given-names: Rafael
+    affiliation: "McMaster University, Canada; University of Granada, Spain"
+  - family-names: Fang
+    given-names: Wei
+    affiliation: "Department of Psychology, Neuroscience & Behaviour, McMaster University, Canada"
+  - family-names: Ripley
+    given-names: Sara
+    affiliation: "Department of Psychology, Neuroscience & Behaviour, McMaster University, Canada"
+  - family-names: Han
+    given-names: Danyang
+    affiliation: "Department of Psychology and Behavioral Sciences, Zhejiang University, China"
+  - family-names: Trainor
+    given-names: Laurel J.
+    affiliation: "Department of Psychology, Neuroscience & Behaviour, McMaster University, Canada"
+repository-code: "https://github.com/McMaster-Baby-Lab/iTemplate2-public"
+url: "https://mcmaster-baby-lab.github.io/iTemplate2-public/"
+license: GPL-3.0-or-later
+keywords:
+  - eye tracking
+  - face processing
+  - areas of interest
+  - template-based registration
+  - dynamic stimuli
+  - wearable eye tracking
+  - MediaPipe
+  - Python
+# TODO: when the paper is published, add its journal, volume, year and DOI below
+# (and doi: at the top level if the software gets its own DOI, for example via Zenodo).
+preferred-citation:
+  type: article
+  status: in-press
+  title: "iTemplate2: An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli"
+  authors:
+    - family-names: Xiao
+      given-names: Naiqi G.
+    - family-names: Román-Caballero
+      given-names: Rafael
+    - family-names: Fang
+      given-names: Wei
+    - family-names: Ripley
+      given-names: Sara
+    - family-names: Han
+      given-names: Danyang
+    - family-names: Trainor
+      given-names: Laurel J.
+references:
+  - type: article
+    title: "iTemplate: A template-based eye movement data analysis approach"
+    authors:
+      - family-names: Xiao
+        given-names: Naiqi G.
+      - family-names: Lee
+        given-names: K.
+    journal: "Behavior Research Methods"
+    volume: 50
+    issue: 6
+    start: 2388
+    end: 2398
+    year: 2018
+    doi: "10.3758/s13428-018-1015-x"
