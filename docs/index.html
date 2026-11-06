@@ -63,7 +63,7 @@ h1{font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.1;margin:18px 0 14px;letter-
 .shot img{border-radius:14px;border:1px solid var(--line);box-shadow:var(--shadow)}
 
 /* sections */
-section{padding:72px 0}
+section{padding:72px 0;scroll-margin-top:60px}
 section.alt{background:var(--bg-alt);border-block:1px solid var(--line)}
 h2{font-size:clamp(1.6rem,3.5vw,2.1rem);line-height:1.2;margin:0 0 10px;letter-spacing:-.02em}
 .sub{color:var(--muted);max-width:680px;margin:0 0 36px}
@@ -121,6 +121,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
     <nav aria-label="Primary">
       <a class="opt" href="#how">How it works</a>
       <a class="opt" href="#features">Features</a>
+      <a class="opt" href="#methods">Compared</a>
+      <a class="opt" href="#examples">Examples</a>
       <a class="opt" href="#screens">Screenshots</a>
       <a href="#install">Install</a>
       <a class="opt" href="#cite">Cite</a>
@@ -133,7 +135,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
   <div class="wrap hero">
     <span class="eyebrow">Open-source · Python · Desktop GUI</span>
     <h1>See where participants looked on moving faces</h1>
-    <p class="lead">iTemplate2 maps eye-tracking gaze data onto a normalised face template, so you can analyse looking behaviour on <b>dynamic face videos</b> and <b>static images</b> without hand-coding frames.</p>
+    <p class="lead">iTemplate2 maps eye-tracking gaze onto a common face template. Define your areas of interest <b>once</b>, then apply them across moving faces, stimuli and participants, in <b>videos</b> and <b>static images</b>.</p>
     <div class="cta">
       <a class="btn primary" href="#install">Get started</a>
       <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md">User guide</a>
@@ -151,8 +153,8 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
         <p class="sub">A guided, step-by-step workflow takes you through the whole pipeline inside one app.</p>
       </div>
       <ol class="steps">
-        <li><b>Extract faces</b><span>MediaPipe finds facial landmarks in every frame of your videos or images, with gap detection and repair.</span></li>
-        <li><b>Map gaze</b><span>Raw gaze coordinates are transformed into a common template face space.</span></li>
+        <li><b>Extract faces</b><span>MediaPipe detects 478 landmarks per face in every frame, for up to five faces, with gap detection and ID checks.</span></li>
+        <li><b>Map gaze</b><span>Each gaze sample is transformed into a common template face space, frame by frame.</span></li>
         <li><b>Visualise</b><span>Play gaze over the stimulus and build heatmaps, normalised per participant.</span></li>
         <li><b>Analyse AOIs</b><span>Draw areas of interest on the template or the stimulus and compute gaze metrics.</span></li>
         <li><b>Export</b><span>Save the columns you need to CSV for your statistics software.</span></li>
@@ -178,19 +180,63 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
       <h2>Key features</h2>
       <p class="sub">Built for researchers who work with faces in motion.</p>
       <div class="features">
-        <div class="card"><h3>Dynamic and static stimuli</h3><p>Process videos frame by frame or work with still face images in the same project.</p></div>
-        <div class="card"><h3>Multi-face scenes</h3><p>Select faces to analyse, and review frames where facial regions overlap with an auditable decision log.</p></div>
-        <div class="card"><h3>Custom templates</h3><p>Use the built-in average face, or choose a template face from your own stimuli or an uploaded image.</p></div>
-        <div class="card"><h3>Landmark quality control</h3><p>Find landmark gaps, set a maximum fill threshold, and glue gaps by interpolation.</p></div>
-        <div class="card"><h3>Heatmaps and playback</h3><p>Interactive gaze overlays and grouped heatmaps with video and image export.</p></div>
-        <div class="card"><h3>Dual-context AOIs</h3><p>Define AOIs on the template face or on the original stimulus, then compute metrics per AOI.</p></div>
-        <div class="card"><h3>Flexible import</h3><p>Column mapping, stimulus-name cleaning and temporal preprocessing with onset/offset trial segmentation.</p></div>
-        <div class="card"><h3>Reproducible projects</h3><p>Saved settings, deterministic output names and a timestamped processing log for every step.</p></div>
+        <div class="card"><h3>Dynamic and static stimuli</h3><p>Frame-by-frame transformation for videos, plus still face images, in the same project.</p></div>
+        <div class="card"><h3>Dense, automatic landmarks</h3><p>478 landmarks per face and frame, up to five faces at once, in place of semi-manual annotation of 39 points.</p></div>
+        <div class="card"><h3>Face ID management</h3><p>Merge, swap, label and remove face tracks (for example "Caregiver" and "Infant"), and review gaze on overlapping facial meshes.</p></div>
+        <div class="card"><h3>Templates</h3><p>Use the built-in average face, or choose a template from your own stimuli or an uploaded face image.</p></div>
+        <div class="card"><h3>Clear gaze classes</h3><p>Every sample is <code>on_face</code>, <code>off_face</code> or <code>unmapped</code>, with the attended <code>face_id</code>. A contour margin tolerates gaze just outside the face outline.</p></div>
+        <div class="card"><h3>Landmark quality control</h3><p>Find landmark gaps, set a maximum fill threshold, glue gaps by interpolation, and re-detect selected frame ranges.</p></div>
+        <div class="card"><h3>Snap-to-landmark AOIs</h3><p>Draw polygon AOIs anchored to the 478-point mesh, share them as JSON, or define AOIs in the original stimulus space.</p></div>
+        <div class="card"><h3>Heatmaps and playback</h3><p>Synchronised raw and template-space playback, grouped heatmaps with per-participant normalisation, and video and image export.</p></div>
+        <div class="card"><h3>Expression and head pose</h3><p>52 blendshape coefficients and 3D head pose per face, to study the stimulus face's expression alongside gaze.</p></div>
+        <div class="card"><h3>Flexible import</h3><p>Column mapping, stimulus-name cleaning and onset/offset trial segmentation with a configurable gaze response lag.</p></div>
+        <div class="card"><h3>Open and reproducible</h3><p>Python with no commercial dependencies, Parquet storage, saved settings and a timestamped log for every step.</p></div>
+        <div class="card"><h3>Screen-based and wearable</h3><p>Normalisation for scene-camera data, independent of the eye tracker's make or model.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="screens">
+  <section id="methods">
+    <div class="wrap">
+      <h2>A complement to existing AOI methods</h2>
+      <p class="sub">Automatic and dynamic AOI tools already handle moving faces well. iTemplate2 adds a different way of working, and is not meant to replace them.</p>
+      <div class="features">
+        <div class="card"><h3>Keyframe AOIs</h3><p>Tools such as Tobii Pro Lab and EyeLink Data Viewer interpolate 2D position and scale between keyframes you define.</p></div>
+        <div class="card"><h3>Landmark-based AOIs</h3><p>Hessels et al. (2018) and FaceTrack-AOI (Zhou et al., 2026) build AOIs from landmarks detected in each frame, in the video's own coordinates.</p></div>
+        <div class="card"><h3>Template space</h3><p>iTemplate2 registers gaze to a common template, so AOIs are defined once, including regions that landmarks do not delineate directly, such as both eyes combined, the forehead or the cheeks. It also supports heatmaps and other spatial analyses.</p></div>
+      </div>
+      <p class="note" style="margin-top:20px">Template registration does not remove the decisions in AOI analysis. It moves some of them to the choice of template, the definition of AOIs on that template, and the inspection of facial detections. Validity still depends on your research question, your gaze data quality and the accuracy of the facial mapping.</p>
+    </div>
+  </section>
+
+  <section id="examples" class="alt">
+    <div class="wrap">
+      <h2>Example applications</h2>
+      <p class="sub">The paper illustrates the workflow with four developmental eye-tracking projects. These show scope and feasibility, not accuracy benchmarks.</p>
+      <div class="features">
+        <div class="card"><h3>Toddlers and emotional expressions</h3><p>Videos of actresses expressing emotion: one set of facial AOIs across actresses and across changing expressions.</p></div>
+        <div class="card"><h3>Live caregiver–infant interaction</h3><p>Dual eye tracking of both partners, with face ID checks after occlusion.</p></div>
+        <div class="card"><h3>Infant-directed speech and singing</h3><p>40 videos in one coordinate space, across 4, 6 and 12 months. Classifications differed from four manual coders in about 7% of frames, specific to this dataset.</p></div>
+        <div class="card"><h3>Free play at home</h3><p>Wearable eye trackers on caregivers and infants, with adult and infant faces summarised on the same template.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="care">
+    <div class="wrap">
+      <h2>Interpret results with care</h2>
+      <p class="sub">The transformation changes how gaze is represented. It does not change the gaze itself.</p>
+      <div class="features">
+        <div class="card"><h3>Gaze quality still limits you</h3><p>Transformation does not improve gaze accuracy or precision. In wearable and infant data, gaze error can match the distance between facial features, so be cautious near AOI boundaries.</p></div>
+        <div class="card"><h3>Landmarks are estimates</h3><p>Detection degrades with occlusion, head rotation beyond about ±70°, low resolution and poor light, and infant faces are under-represented in the model's training data.</p></div>
+        <div class="card"><h3>The template shapes the output</h3><p>The built-in template averages White female faces from the Chicago Face Database. It does not establish equal detection accuracy across ages or demographic groups.</p></div>
+        <div class="card"><h3>Off-face is not a face location</h3><p>Peripheral template coordinates are for display only. Use stimulus-space AOIs for gaze between or beyond faces; these are currently static.</p></div>
+      </div>
+      <p class="note" style="margin-top:20px">Read more in <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/blob/main/docs/user-guide.md#interpreting-transformed-gaze">Interpreting Transformed Gaze</a>.</p>
+    </div>
+  </section>
+
+  <section id="screens" class="alt">
     <div class="wrap">
       <h2>Screenshots</h2>
       <p class="sub">Click an image to view it full size.</p>
@@ -215,7 +261,7 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
     </div>
   </section>
 
-  <section id="install" class="alt">
+  <section id="install">
     <div class="wrap">
       <h2>Install and run</h2>
       <p class="sub">Requires Python 3.10 to 3.13 on macOS, Windows or Linux. The face model and template are included.</p>
@@ -243,11 +289,12 @@ python start_gui.py</div>
     </div>
   </section>
 
-  <section id="cite">
+  <section id="cite" class="alt">
     <div class="wrap">
       <h2>Cite iTemplate2</h2>
-      <p class="sub">If iTemplate2 helps your research, please cite the paper.</p>
+      <p class="sub">If iTemplate2 helps your research, please cite the paper. The original method is described in Xiao &amp; Lee (2018).</p>
       <blockquote>Xiao, N. G., Román-Caballero, R., Fang, W., Ripley, S., Han, D., &amp; Trainor, L. J. (in press). iTemplate2: An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.</blockquote>
+      <blockquote>Xiao, N. G., &amp; Lee, K. (2018). iTemplate: A template-based eye movement data analysis approach. <i>Behavior Research Methods, 50</i>(6), 2388–2398. <a href="https://doi.org/10.3758/s13428-018-1015-x">https://doi.org/10.3758/s13428-018-1015-x</a></blockquote>
       <!-- TODO: add journal, volume, year and DOI once available -->
       <p class="note">Questions or bug reports? Open an <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">issue on GitHub</a>.</p>
     </div>
@@ -256,7 +303,7 @@ python start_gui.py</div>
 
 <footer>
   <div class="wrap">
-    <div>Developed by Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Wei Fang, Dr. Rafael Román-Caballero, Sara Ripley and Dr. Laurel J. Trainor.<br>McMaster Baby Lab, McMaster University.</div>
+    <div>Developed by Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Rafael Román-Caballero, Dr. Wei Fang, Sara Ripley, Dr. Danyang Han and Dr. Laurel J. Trainor.<br>McMaster Baby Lab, McMaster University, with the University of Granada and Zhejiang University.<br>Supported by SSHRC, NSERC, CIFAR, NSFC and the EU Horizon 2020 programme (MSCA). Full funding details are in the <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public#funding-and-acknowledgements">README</a>.</div>
     <div><a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">GitHub</a> · <a href="https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues">Issues</a></div>
   </div>
 </footer>

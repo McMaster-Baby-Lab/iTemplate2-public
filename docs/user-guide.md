@@ -149,7 +149,10 @@ This page is where you prepare and inspect stimulus landmarks:
 | **Add Stimuli** | Select stimulus files (`.mp4`, `.avi`, `.mov`, `.webm`, `.jpg`, `.jpeg`, `.png`, `.bmp`). |
 | **Clear** | Remove all files from the list. |
 | **Parallel Workers** | Number of files to process simultaneously (see [Parameter Reference](#parameter-reference)). |
+| **Expected Faces** | Maximum number of faces the detector looks for in each frame, from 1 to 5 (default 1). The detector can return fewer faces in any frame. Set this to the largest number of people you expect to be visible at once. |
 | **Start Extraction** | Runs landmark extraction. A progress bar is displayed directly on the button, showing the percentage of files completed. Output is saved to `processed_stimuli_data/` primarily as Parquet files (CSV optional). |
+
+Alongside the 478-point landmark file, extraction also saves, for each stimulus in `processed_stimuli_data/`, a `<name>_blendshapes.parquet` file (52 facial blendshape coefficients per detected face and frame) and a `<name>_transformation.parquet` file (3D head-pose transformation matrices). These let you analyse the stimulus face's expression and head pose alongside gaze. Tick **Also export CSV compatibility files** to write CSV copies as well.
 
 > **Notice:** If processed landmarks already exist in `processed_stimuli_data/`, a blue banner at the top of the page will inform you. You can skip this step if landmarks are already available.
 
@@ -468,6 +471,7 @@ Runs the core iTemplate2 transformation pipeline — co-registering gaze coordin
 | **Landmark Folder** | Path to the folder containing processed landmark data (auto-populated to `processed_stimuli_data/`). |
 | **Parallel Workers** | Number of Dask workers for parallel computation (see [Parameter Reference](#parameter-reference)). |
 | **Max Gap Fill (seconds)** | Maximum gap size (in seconds) that is automatically filled during Stage 1 (Frame Index Remapping). Gaps larger than this threshold are skipped, and gaze rows in those frames remain as NaN. Set to 60.0 to disable the threshold (fill all gaps). Default: 2.0 seconds. See [Gap Management](gap_management.md) for details. |
+| **Face Contour Margin (%)** | Enlarges each detected face outline by 0–30% (default 0) during transformation. Gaze recorded just outside the outline because of eye-tracker error is then mapped onto the template face instead of being classified as off-face. The extracted landmarks and the template are not changed. Use **Show Contour Margin** in Face Extraction to preview the enlarged outline. The margin is saved with the project and with each output file so you can report it. |
 | **Run Transformation Pipeline** | Starts the transformation. A progress bar is displayed on the button, showing the percentage of stimuli processed. |
 
 **Output** (saved to `transformed_data/`):
@@ -696,6 +700,7 @@ All parameters below are persisted in `project_settings.json`.
 | Parallel Workers | `processing.parallel_workers` | `CPU count` | Number of Dask workers for parallel transformation. |
 | Max Gap Fill (seconds) | `processing.max_gap_seconds` | `2.0` | Gaps larger than this (in seconds) are not auto-filled during Stage 1 (Frame Index Remapping). Set to 60.0 to disable. |
 | Default FPS | `processing.default_fps` | `30.0` | Frames per second used to convert the Max Gap Fill seconds value to frame count. |
+| Face Contour Margin (%) | `processing.contour_margin_pct` | `0` | Percentage (0–30) by which each detected face outline is enlarged during transformation, so gaze just outside the outline is mapped onto the template face. |
 | Max Gap Fill (seconds) | `processing.max_gap_seconds` | `2.0` | Gaps larger than this (in seconds) are not auto-filled during Stage 1 frame index remapping. Set to 60.0 to disable. |
 | Default FPS | `processing.default_fps` | `30.0` | Frames per second used to convert the Max Gap Fill threshold from seconds to frame count. |
 
@@ -782,6 +787,20 @@ Each entry is formatted as:
 - Errors, warnings, and debug-level diagnostics
 
 The log persists across sessions (append mode), providing a full audit trail of all processing performed on a project. Console output is also preserved, so you can observe progress in real time.
+
+---
+
+## Interpreting Transformed Gaze
+
+iTemplate2 changes the coordinate system in which gaze is represented. It does not change the gaze data itself. Keep the following in mind when you interpret results.
+
+- **Gaze quality still limits what you can conclude.** The transformation does not improve the accuracy or precision of the recorded gaze, remove noise, or recover missing samples. A sample recorded with spatial error is mapped to the template location that matches its *recorded* position. In wearable and infant recordings, gaze error can be as large as, or larger than, the size of and distance between facial features, so feature-level conclusions near AOI boundaries need caution. Assess data quality for each recording, and check whether your conclusions change when you move AOI boundaries or change the **Face Contour Margin**.
+- **Landmarks are estimates.** Mapping is piecewise affine: each triangle of the face mesh is mapped linearly to the matching template triangle, which assumes deformation within a triangle is approximately linear. Landmark errors (occlusion, extreme head rotation beyond roughly ±70°, low resolution, poor lighting) carry through to the mapped gaze. Infant faces are under-represented in the detection model's training data, so allow extra time for quality control. The mapping does not establish equal detection accuracy across ages or demographic groups.
+- **The template matters.** The built-in template is an average of the White female faces in the Chicago Face Database (Ma et al., 2015), with its 478 landmarks detected by the same MediaPipe model used for stimuli. It need not match the age, sex or ethnicity of your stimuli, but its geometry determines the transformed coordinates. AOIs are stored separately for each template, so define or review them after switching templates. See [Custom template faces](#custom-template-faces).
+- **Off-face gaze is not a facial location.** Samples outside every selected face get `gaze_region = off_face` and have no `face_id`. Their peripheral template coordinates are for display only and are excluded from template AOIs. Use stimulus-space AOIs for off-face questions, for example gaze between two interlocutors. Stimulus AOIs are static, so they may not follow people who move.
+- **Face order is not depth order.** When facial meshes overlap, the first matching face in ID order takes precedence. This does not mean that face is in front. Use [Review overlapping faces](#review-overlapping-faces) to check those samples.
+- **Corrected IDs matter.** Automatic tracking can swap or fragment face IDs after occlusion. Check identities in Face Extraction before transforming, otherwise gaze may be assigned to the wrong person.
+- **A complement, not a replacement.** Automatic AOI tools that work in the original video space, such as landmark-based AOIs (Hessels et al., 2018; Zhou et al., 2026), can give comparable AOI results. iTemplate2 adds a shared template space for customisable AOIs and spatial analysis such as heatmaps.
 
 ---
 

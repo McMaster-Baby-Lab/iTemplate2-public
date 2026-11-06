@@ -85,7 +85,7 @@ class AboutView(QWidget):
         layout.addWidget(dev_title)
 
         dev_info = QLabel(
-            "Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Rafael Román-Caballero,"
+            "Dr. Gabriel (Naiqi) Xiao with contributions from Dr. Rafael Román-Caballero, "
             "Dr. Wei Fang, Sara Ripley, Dr. Danyang Han, and Dr. Laurel J. Trainor\n"
             "McMaster Baby Lab\n"
             "McMaster University"
