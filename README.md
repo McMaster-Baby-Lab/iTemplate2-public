@@ -2,7 +2,7 @@
 
 **An open-source Python toolbox for automatic eye-movement analysis of dynamic facial stimuli.**
 
-[Project page](https://mcmaster-baby-lab.github.io/iTemplate2-public/) · [User guide](docs/user-guide.md) · [Report an issue](https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues) · [License: GPL v3](LICENSE)
+[Project page](https://mcmaster-baby-lab.github.io/iTemplate2-public/) · [Demo video](https://mcmaster-baby-lab.github.io/iTemplate2-public/#demo) · [User guide](docs/user-guide.md) · [Report an issue](https://github.com/McMaster-Baby-Lab/iTemplate2-public/issues) · [License: GPL v3](LICENSE)
 
 ![iTemplate2 face extraction screen](docs/assets/face-extraction.webp)
 

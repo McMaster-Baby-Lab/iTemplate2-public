@@ -96,6 +96,7 @@ figcaption{margin-top:12px;font-size:.92rem;color:var(--muted);line-height:1.55}
 figcaption .tag{display:block;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
 .hero-fig{margin-top:48px}
 .hero-fig .fig{max-width:1080px}
+.vid{background:#000}.vid video{width:100%;height:auto;display:block}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px 28px}
 @media(max-width:820px){.grid2{grid-template-columns:1fr}}
 .split{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center}
@@ -211,9 +212,15 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 
     <a class="btn" href="https://github.com/McMaster-Baby-Lab/iTemplate2-public">View on GitHub</a>
   </div>
   <p class="badge"><b>In press</b><span>Xiao, Román-Caballero, Fang, Ripley, Han &amp; Trainor</span></p>
-  <figure class="hero-fig">
-    <a class="fig" href="assets/fig5-gaze-before-after.webp"><img src="assets/fig5-gaze-before-after.webp" width="1381" height="605" alt="Gaze samples on a video frame of an actress (left) and the same samples after transformation onto the template face (right); off-face samples are magenta."></a>
-    <figcaption><span class="tag">Paper figure 5</span>Gaze samples before (left, screen space) and after (right, template space) coordinate transformation. On-face samples are mapped using the estimated landmarks of the selected face. Off-face samples, shown as magenta dots, appear in peripheral template space for display only and are excluded from facial AOIs.</figcaption>
+  <figure class="hero-fig" id="demo">
+    <div class="fig vid">
+      <video id="demo-video" width="1600" height="686" autoplay muted loop playsinline controls preload="metadata" poster="assets/itemplate2-demo-poster.webp" aria-label="Demo: gaze samples on a stimulus video, left, and the same samples transformed onto the template face, right">
+        <source src="assets/itemplate2-demo.webm" type="video/webm; codecs=vp9">
+        <source src="assets/itemplate2-demo.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="assets/itemplate2-demo.mp4">Download the MP4</a>.
+      </video>
+    </div>
+    <figcaption><span class="tag">Demo · Visualization export</span>Left: gaze samples over the original stimulus video. Right: the same samples after transformation onto the template face. Dots are gaze samples; colours distinguish participants.</figcaption>
   </figure>
 </div>
 
@@ -573,7 +580,11 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 
       <div class="n">1</div>
       <div>
         <h3>Toddlers and emotional expressions</h3>
-        <p>Fang and Xiao (2026) showed 12- to 24-month-old toddlers videos of actresses expressing emotions toward novel objects. Facial features moved continuously and varied across actresses, so fixed AOIs would likely have misclassified gaze. The 478-point mesh follows each expression, and snap-to-landmark AOIs give one consistent set of regions across actresses and emotions. The hand gesture in the figure at the top of this page is classified as off-face.</p>
+        <p>Fang and Xiao (2026) showed 12- to 24-month-old toddlers videos of actresses expressing emotions toward novel objects. Facial features moved continuously and varied across actresses, so fixed AOIs would likely have misclassified gaze. The 478-point mesh follows each expression, and snap-to-landmark AOIs give one consistent set of regions across actresses and emotions. The hand gesture in the figure below is classified as off-face.</p>
+          <figure>
+    <a class="fig" href="assets/fig5-gaze-before-after.webp"><img src="assets/fig5-gaze-before-after.webp" width="1381" height="605" alt="Gaze samples on a video frame of an actress (left) and the same samples after transformation onto the template face (right); off-face samples are magenta."></a>
+    <figcaption><span class="tag">Paper figure 5</span>Gaze samples before (left, screen space) and after (right, template space) coordinate transformation. On-face samples are mapped using the estimated landmarks of the selected face. Off-face samples, shown as magenta dots, appear in peripheral template space for display only and are excluded from facial AOIs.</figcaption>
+  </figure>
       </div>
     </div>
 
@@ -746,6 +757,9 @@ python start_gui.py</div>
 </footer>
 
 <script>
+(function(){var v=document.getElementById('demo-video');
+  if(v && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){v.removeAttribute('autoplay');v.pause();}
+})();
 document.querySelectorAll('[data-copy]').forEach(function(box){
   var btn = box.querySelector('.copy');
   btn.addEventListener('click', function(){
